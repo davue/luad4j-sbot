@@ -26,6 +26,17 @@ function addCommand(command, func)
 	chatCommands[command] = func
 end
 
+-- Checks if sender is admin
+function isAdmin(msg)
+	for k, v in pairs(admins) do
+		if(msg.author.id == v) then
+			return true
+		end
+	end
+	sendMessage(msg.channel.id, "["..botName.."] Admin-Only Command")
+	return false
+end
+
 function handleMessage(msg)
 	if(msg.text ~= nil) then -- if there is actually text
 		if(string.sub(msg.text,1,1) == "!") then -- if it starts like a command
@@ -105,17 +116,6 @@ function handleMessageOld(msg)
 			end
 		end
 	end
-end
-
--- Checks if sender is admin
-function isAdmin(msg)
-	for k, v in pairs(admins) do
-		if(msg.author.id == v) then
-			return true
-		end
-	end
-	sendMessage(msg.channel.id, "["..botName.."] Admin-Only Command")
-	return false
 end
 
 -- Vital chat commands
