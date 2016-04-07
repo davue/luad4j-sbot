@@ -121,8 +121,8 @@ end
 -- Vital chat commands
 addCommand("update", function(msg, args)
 	if(isAdmin(msg)) then
-		os.capture("cd /home/pi/discord/lua/ && git reset --hard")
-		local text = os.capture("cd /home/pi/discord/lua/ && git pull")
+		os.execute("git -C ".. installPath .." reset --hard")
+		local text = os.capture("git -C ".. installPath .." pull")
 		if (text ~= "Already up-to-date.") then
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
