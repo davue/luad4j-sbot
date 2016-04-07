@@ -18,7 +18,7 @@ function onLuaError(reason)
 end
 
 function onPortData(data)
-	sendMessage(mainChannel, "Data arrived over external port: "..data)
+	sendMessage(mainChannel, data)
 end
 
 -- Core functions
