@@ -124,6 +124,8 @@ addCommand("update", function(msg, args)
 		os.execute("git -C ".. installPath .." reset --hard")
 		local text = os.capture("git -C ".. installPath .." pull")
 		if (text ~= "Already up-to-date.") then
+			sendMessage(mainChannel, text)
+			
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
