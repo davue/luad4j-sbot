@@ -5,8 +5,12 @@ This modules provides functions to interact with the voice channel
 
 ]]
 
-addCommand("play", function(msg, args)
+addCommand("add", function(msg, args)
 	queueFile(getVoiceChannels(msg.guild.id)[1].id, args[1])
+end)
+
+addCommand("addURL", function(msg, args)
+	queueURL(getVoiceChannels(msg.guild.id)[1].id, args[1])
 end)
 
 addCommand("stop", function(msg, args)
@@ -14,8 +18,10 @@ addCommand("stop", function(msg, args)
 end)
 
 addCommand("volume", function(msg, args)
-	if(isAdmin(msg)) then
+	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 		setAudioVolume(getVoiceChannels(msg.guild.id)[1].id, args[1])
+	else
+		sendMessage(mainChannel, "Usage: volume <0 - 1>")
 	end
 end)
 
