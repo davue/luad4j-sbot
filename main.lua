@@ -18,23 +18,12 @@ function onLuaError(reason)
 end
 
 function onPortData(data)
-	sendMessage(mainChannel, data)
+	sendMessage(mainChannel, "Data arrived over external port: "..data)
 end
 
 -- Core functions
 function addCommand(command, func)
 	chatCommands[command] = func
-end
-
--- Checks if sender is admin
-function isAdmin(msg)
-	for k, v in pairs(admins) do
-		if(msg.author.id == v) then
-			return true
-		end
-	end
-	sendMessage(msg.channel.id, "Admin-Only Command")
-	return false
 end
 
 function handleMessage(msg)
@@ -48,7 +37,7 @@ function handleMessage(msg)
 			if(chatCommands[command] ~= nil) then -- if command exists
 				chatCommands[command](msg, args) -- call command with msg and arguments
 			else
-				sendMessage(msg.channel.id, "Unknown command.")
+				sendMessage(msg.channel.id, "["..botName.."] Unknown command.")
 			end
 		end
 	end
@@ -118,12 +107,25 @@ function handleMessageOld(msg)
 	end
 end
 
+-- Checks if sender is admin
+function isAdmin(msg)
+	for k, v in pairs(admins) do
+		if(msg.author.id == v) then
+			return true
+		end
+	end
+	sendMessage(msg.channel.id, "["..botName.."] Admin-Only Command")
+	return false
+end
+
 -- Vital chat commands
 addCommand("update", function(msg, args)
 	if(isAdmin(msg)) then
 		os.execute("git -C ".. installPath .." reset --hard")
 		local text = os.capture("git -C ".. installPath .." pull")
 		if (text ~= "Already up-to-date.") then
+			sendMessage(mainChannel, text)
+			
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
@@ -139,13 +141,13 @@ addCommand("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
-			sendMessage(mainChannel, "An error occured while running the script:\n"..errorStr)
+			sendMessage(mainChannel, "["..botName.."] An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
 	end
 end)
- 
+
 -- Function to execute "cmd" in the standard command line and returns it's output.
 -- is needed to initialize
 function os.capture(cmd, raw)
