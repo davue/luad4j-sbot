@@ -127,7 +127,7 @@ addCommand("update", function(msg, args)
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
-			send_text(msg.to.print_name, "[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
+			sendMessage(mainChannel, "[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
 			sendMessage(mainChannel, "[Update] Please reload the bot to apply the changes.")		-- Safety delay to give the update process some time (needs admin credentials)
 		else
 			sendMessage(mainChannel, "[Update] Already up-to-date.")
