@@ -9,7 +9,7 @@ addCommand("add", function(msg, args)
 	if(#args == 1) then
 		queueFile(getVoiceChannels(msg.guild.id)[1].id, args[1])
 	else
-		sendMessage(mainChannel, "Usage: add <soundpath>")
+		sendMessage(msg.channel.id, "Usage: add <soundpath>")
 	end
 end)
 
@@ -17,7 +17,7 @@ addCommand("addURL", function(msg, args)
 	if(#args == 1) then
 		queueURL(getVoiceChannels(msg.guild.id)[1].id, args[1])
 	else
-		sendMessage(mainChannel, "Usage: add <soundurl>")
+		sendMessage(msg.channel.id, "Usage: add <soundurl>")
 	end
 end)
 
@@ -29,7 +29,7 @@ addCommand("volume", function(msg, args)
 	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 		setAudioVolume(getVoiceChannels(msg.guild.id)[1].id, args[1])
 	else
-		sendMessage(mainChannel, "Usage: volume <0 - 1>")
+		sendMessage(msg.channel.id, "Usage: volume <0 - 1>")
 	end
 end)
 
