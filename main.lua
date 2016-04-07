@@ -145,7 +145,7 @@ addCommand("reload", function(msg, args)
 		end
 	end
 end)
-
+ 
 -- Function to execute "cmd" in the standard command line and returns it's output.
 -- is needed to initialize
 function os.capture(cmd, raw)
