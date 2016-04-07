@@ -6,11 +6,19 @@ This modules provides functions to interact with the voice channel
 ]]
 
 addCommand("add", function(msg, args)
-	queueFile(getVoiceChannels(msg.guild.id)[1].id, args[1])
+	if(#args == 1) then
+		queueFile(getVoiceChannels(msg.guild.id)[1].id, args[1])
+	else
+		sendMessage(mainChannel, "Usage: add <soundpath>")
+	end
 end)
 
 addCommand("addURL", function(msg, args)
-	queueURL(getVoiceChannels(msg.guild.id)[1].id, args[1])
+	if(#args == 1) then
+		queueURL(getVoiceChannels(msg.guild.id)[1].id, args[1])
+	else
+		sendMessage(mainChannel, "Usage: add <soundurl>")
+	end
 end)
 
 addCommand("stop", function(msg, args)
