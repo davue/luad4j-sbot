@@ -7,7 +7,7 @@ modulePath = installPath.."/modules/"
 mainChannel = "165560868426219520" -- #stammbot-dev-channel @ Stammgruppe Afterbirth
 
 local admins = {"163605020271575041"} -- Dave-it
- 
+
 -- Events
 function onMessageReceived(msg)
 	hook.Call("onMessageReceived", msg)
