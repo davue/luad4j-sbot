@@ -33,7 +33,7 @@ function isAdmin(msg)
 			return true
 		end
 	end
-	sendMessage(msg.channel.id, "["..botName.."] Admin-Only Command")
+	sendMessage(msg.channel.id, "Admin-Only Command")
 	return false
 end
 
@@ -48,7 +48,7 @@ function handleMessage(msg)
 			if(chatCommands[command] ~= nil) then -- if command exists
 				chatCommands[command](msg, args) -- call command with msg and arguments
 			else
-				sendMessage(msg.channel.id, "["..botName.."] Unknown command.")
+				sendMessage(msg.channel.id, "Unknown command.")
 			end
 		end
 	end
@@ -139,7 +139,7 @@ addCommand("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
-			sendMessage(mainChannel, "["..botName.."] An error occured while running the script:\n"..errorStr)
+			sendMessage(mainChannel, "An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
