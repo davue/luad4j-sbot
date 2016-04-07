@@ -1,6 +1,6 @@
 chatCommands = {} -- chatCommands[command] = function of command
 botName = "S-Bot"
-installPath = "/home/pi/discord/lua"
+installPath = "/home/Dave/discord/lua"
 defaultFilePath = installPath.."/main.lua"
 libPath = installPath.."/lib/"
 modulePath = installPath.."/modules/"
