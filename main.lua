@@ -17,6 +17,10 @@ function onLuaError(reason)
 	sendMessage(mainChannel, "An error occured while running the script:\n"..reason)
 end
 
+function onPortData(data)
+	sendMessage(mainChannel, "Data arrived over external port: "..data)
+end
+
 -- Core functions
 function addCommand(command, func)
 	chatCommands[command] = func
@@ -114,11 +118,28 @@ function isAdmin(msg)
 	return false
 end
 
+-- Vital chat commands
+addCommand("update", function(msg, args)
+	if(isAdmin(msg)) then
+		os.capture("cd /home/pi/discord/lua/ && git reset --hard")
+		local text = os.capture("cd /home/pi/discord/lua/ && git pull")
+		if (text ~= "Already up-to-date.") then
+			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
+			text = string.sub(text, endPos+15)														-- Remove version hashes from string
+			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
+			send_text(msg.to.print_name, "["..botName.."][Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
+			postpone("chatCommands[\"reload\"]", 1)													-- Safety delay to give the update process some time (needs admin credentials)
+		else
+			send_text(msg.to.print_name, "["..botName.."][Update] Already up-to-date.")
+		end
+	end
+end)
+
 addCommand("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
-			sendMessage(msg.channel.id, "["..botName.."] An error occured while running the script:\n"..errorStr)
+			sendMessage(mainChannel, "["..botName.."] An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
