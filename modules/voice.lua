@@ -17,7 +17,7 @@ addCommand("addURL", function(msg, args)
 	if(#args == 1) then
 		queueURL(getVoiceChannels(msg.guild.id)[1].id, args[1])
 	else
-		sendMessage(msg.channel.id, "Usage: add <soundurl>")
+		sendMessage(msg.channel.id, "Usage: addURL <soundurl>")
 	end
 end)
 
