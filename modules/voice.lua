@@ -114,3 +114,10 @@ addCommand("fskip", function(msg, args)
 		skipAudio(connectedChannel)
 	end
 end)
+
+-- leave all open voice channels on module loads
+for k, guild in pairs(getGuilds()) do
+	for k, channel in pairs(getVoiceChannels(guild.id)) do
+		leaveVoiceChannel(channel.id)
+	end
+end
