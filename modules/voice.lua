@@ -1,6 +1,6 @@
 local connectedChannel = nil
 
-command.Add("add", function(msg, args)
+command.add("add", function(msg, args)
 	if(#args == 1) then
 		err = queueFile(connectedChannel, args[1])
 		if(err ~= nil) then
@@ -15,7 +15,7 @@ command.Add("add", function(msg, args)
 	end
 end)
 
-command.Add("addURL", function(msg, args)
+command.add("addURL", function(msg, args)
 	if(#args == 1) then
 		err = queueURL(connectedChannel, args[1])
 		if(err ~= nil) then
