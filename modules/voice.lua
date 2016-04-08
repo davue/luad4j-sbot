@@ -96,8 +96,10 @@ end)
 
 addCommand("leaveVoice", function(msg, args)
 	if(isAdmin(msg)) then
-		leaveVoiceChannel(connectedChannel)
-		connectedChannel = nil
+		if(connectedChannel ~= nil) then
+			leaveVoiceChannel(connectedChannel)
+			connectedChannel = nil
+		end
 	end
 end)
 
