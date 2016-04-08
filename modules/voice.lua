@@ -53,6 +53,7 @@ addCommand("joinVoice", function(msg, args)
 					if (v.name == args[2]) then
 						joinVoiceChannel(v.id)
 						table.insert(connectedChannels, v.id)
+						break
 					else
 						sendMessage(msg.channel.id, "Could not find channel: \""..args[2].."\"")
 					end
