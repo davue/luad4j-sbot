@@ -48,7 +48,7 @@ addCommand("joinVoice", function(msg, args)
 		local voiceChannels = getVoiceChannels(msg.guild.id)
 		
 		if(#voiceChannels > 1) then
-			if(#args > 1) then
+			if(#args >= 1) then
 				for k,v in pairs(voiceChannels) do
 					if (v.name == args[2]) then
 						joinVoiceChannel(v.id)
