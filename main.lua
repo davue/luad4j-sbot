@@ -9,47 +9,33 @@ local admins = {"163605020271575041"} -- Dave-it
 ------------------------
 ---- Initialization ----
 ------------------------
-function os.capture(cmd, raw)
-	local f = assert(io.popen(cmd, 'r'))
-	local s = assert(f:read('*a'))
-	f:close()
-	if raw then return s end
-	s = string.gsub(s, '^%s+', '')
-	s = string.gsub(s, '%s+$', '')
-	s = string.gsub(s, '[\n\r]+', ' ')
-	return s
+function loadDependencyManager()
+	local func, errorStr = loadfile(libPath.."depends.lua")
+	if(func == nil) then
+		sendMessage(mainChannel, "[INIT][ERROR] An error occured while loading dependency manager:\n"..errorStr)
+	else
+		func()
+	end
 end
 
 function loadLibs() -- Load Libraries
-	lsStr = os.capture("ls "..libPath)
-	local libs = {}
+	local lsStr = os.capture("ls "..libPath)
 	for file in string.gmatch(lsStr, "%a+.lua") do 
-		func, errorStr = loadfile(libPath..file) 
-		if(func == nil) then
-			sendMessage(mainChannel, "[INIT][ERROR] Error loading library ("..file.."):\n"..errorStr)
-		else
-			func()
-			print("[LUA] Library ("..file..") loaded!")
-		end
+		depends.onLib(file)
 	end
 end
 
 function loadModules() -- Load Modules
-	lsStr = os.capture("ls "..modulePath)
-	local modules = {}
+	local lsStr = os.capture("ls "..modulePath)
 	for file in string.gmatch(lsStr, "%a+.lua") do 
-		func, errorStr = loadfile(modulePath..file) 
-		if(func == nil) then
-			sendMessage(mainChannel, "[INIT][ERROR] Error loading module ("..file.."):\n"..errorStr)
-		else
-			func()
-			print("[LUA] Module ("..file..") loaded!")
-		end
+		depends.onModule(file)
 	end
 end
 
-loadLibs()			-- Load essential libraries
-loadModules()		-- Load additional modules
+loadDependencyManager() -- Load dependency manager
+
+loadLibs()				-- Load essential libraries
+loadModules()			-- Load additional modules
 
 sendMessage(mainChannel, "[INFO] Initialized!")
 

@@ -1,4 +1,4 @@
-require("hook")
+depends.onLib("hook")
 
 --[[ Command Lib - Docs:
 The command library contains the chat command handling of the bot
