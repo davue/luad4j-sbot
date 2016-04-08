@@ -10,7 +10,7 @@ local connectedChannel = ""
 addCommand("add", function(msg, args)
 	if(#args == 1) then
 		err = queueFile(connectedChannel, args[1])
-		if(err != nil) then
+		if(err ~= nil) then
 			if(err == "DiscordException") then
 				sendMessage(msg.channel.id, "I am not in a channel yet.")
 			else
@@ -25,7 +25,7 @@ end)
 addCommand("addURL", function(msg, args)
 	if(#args == 1) then
 		err = queueURL(connectedChannel, args[1])
-		if(err != nil) then
+		if(err ~= nil) then
 			if(err == "DiscordException") then
 				sendMessage(msg.channel.id, "I am not in a channel yet.")
 			else
