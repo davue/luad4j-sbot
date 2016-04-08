@@ -50,12 +50,12 @@ addCommand("joinVoice", function(msg, args)
 		if(#voiceChannels > 1) then
 			if(#args >= 1) then
 				for k,v in pairs(voiceChannels) do
-					if (v.name == args[2]) then
+					if (v.name == args[1]) then
 						joinVoiceChannel(v.id)
 						table.insert(connectedChannels, v.id)
 						break
 					else
-						sendMessage(msg.channel.id, "Could not find channel: \""..args[2].."\"")
+						sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
 					end
 				end
 			else
