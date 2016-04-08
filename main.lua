@@ -1,5 +1,4 @@
-botName = "S-Bot"
-installPath = "/home/Dave/discord/lua"
+installPath = "/home/pi/discord/lua"
 defaultFilePath = installPath.."/main.lua"
 libPath = installPath.."/lib/"
 modulePath = installPath.."/modules/"
@@ -27,7 +26,7 @@ function loadLibs() -- Load Libraries
 	for file in string.gmatch(lsStr, "%a+.lua") do 
 		func, errorStr = loadfile(libPath..file) 
 		if(func == nil) then
-			sendMessage(mainChannel, "[INIT] Error loading library ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[INIT][ERROR] Error loading library ("..file.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Library ("..file..") loaded!")
@@ -41,7 +40,7 @@ function loadModules() -- Load Modules
 	for file in string.gmatch(lsStr, "%a+.lua") do 
 		func, errorStr = loadfile(modulePath..file) 
 		if(func == nil) then
-			sendMessage(mainChannel, "[INIT] Error loading module ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[INIT][ERROR] Error loading module ("..file.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Module ("..file..") loaded!")
@@ -77,7 +76,7 @@ core.addCommand("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
-			sendMessage(mainChannel, "["..botName.."] An error occured while running the script:\n"..errorStr)
+			sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
@@ -92,7 +91,7 @@ function onMessageReceived(msg)
 end
 
 function onLuaError(reason)
-	sendMessage(mainChannel, "An error occured while running the script:\n"..reason)
+	sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..reason)
 end
 
 function onPortData(data)

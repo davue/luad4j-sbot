@@ -35,11 +35,11 @@ addCommand("lua", function(msg, args)
 				if (func ~= nil) then
 					func()
 				else
-					sendMessage(msg.channel.id, "An error occured while running the script:\n"..errorStr)
+					sendMessage(msg.channel.id, "[ERROR] An error occured while running the script:\n"..errorStr)
 				end
 			end
 		else
-			sendMessage(msg.channel.id, "Usage: lua <luascript>")
+			sendMessage(msg.channel.id, "[INFO] Usage: lua <luascript>")
 		end
 	end
 end)
@@ -54,7 +54,7 @@ addCommand("sh", function(msg, args)
 				sendMessage(msg.channel.id, "[Empty]")
 			end
 		else
-			sendMessage(msg.channel.id, "Usage: sh <shellcmd>")
+			sendMessage(msg.channel.id, "[INFO] Usage: sh <shellcmd>")
 		end
 	end
 end)
@@ -66,5 +66,5 @@ addCommand("help", function(msg, args)
 			cmds = cmds..key.."\n"
 		end
 	end
-	sendMessage(msg.channel.id, "Available commands:\n"..cmds)
+	sendMessage(msg.channel.id, "[INFO] Available commands:\n"..cmds)
 end)
