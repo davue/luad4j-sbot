@@ -58,7 +58,7 @@ end)
 
 command.add("reload", function(msg, args)
 	if(core.isAdmin(msg)) then
-		func, errorStr = loadfile(defaultFilePath)
+		func, errorStr = loadfile(luaPath .."main.lua")
 		if(func == nil) then
 			sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..errorStr)
 		else
