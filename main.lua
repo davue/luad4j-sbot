@@ -21,14 +21,14 @@ end
 
 function loadLibs() -- Load Libraries
 	local lsStr = os.capture("ls "..libPath)
-	for file in string.gmatch(lsStr, "%a+.lua") do 
+	for file in string.gmatch(lsStr, "(%a+).lua") do 
 		depends.onLib(file)
 	end
 end
 
 function loadModules() -- Load Modules
 	local lsStr = os.capture("ls "..modulePath)
-	for file in string.gmatch(lsStr, "%a+.lua") do 
+	for file in string.gmatch(lsStr, "(%a+).lua") do 
 		depends.onModule(file)
 	end
 end
