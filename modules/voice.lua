@@ -115,4 +115,4 @@ command.add("fskip", function(msg, args)
 	end
 end)
 
-hook.Add("lua_onReload", "kickFromVoice", command.getTable["leaveVoice"])
+hook.Add("lua_onReload", "kickFromVoice", command.getTable()["leaveVoice"])
