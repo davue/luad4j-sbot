@@ -12,13 +12,13 @@ addCommand("add", function(msg, args)
 		err = queueFile(connectedChannel, args[1])
 		if(err ~= nil) then
 			if(err == "DiscordException") then
-				sendMessage(msg.channel.id, "I am not in a channel yet.")
+				sendMessage(msg.channel.id, "[INFO] I am not in a channel yet.")
 			else
-				sendMessage(msg.channel.id, "An unknown error occured.")
+				sendMessage(msg.channel.id, "[ERROR] An unknown error occured.")
 			end
 		end
 	else
-		sendMessage(msg.channel.id, "Usage: add <soundpath>")
+		sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
 	end
 end)
 
@@ -27,13 +27,13 @@ addCommand("addURL", function(msg, args)
 		err = queueURL(connectedChannel, args[1])
 		if(err ~= nil) then
 			if(err == "DiscordException") then
-				sendMessage(msg.channel.id, "I am not in a channel yet.")
+				sendMessage(msg.channel.id, "[INFO] I am not in a channel yet.")
 			else
-				sendMessage(msg.channel.id, "An unknown error occured.")
+				sendMessage(msg.channel.id, "[ERROR] An unknown error occured.")
 			end
 		end
 	else
-		sendMessage(msg.channel.id, "Usage: addURL <soundurl>")
+		sendMessage(msg.channel.id, "[INFO] Usage: addURL <soundurl>")
 	end
 end)
 
@@ -45,7 +45,7 @@ addCommand("volume", function(msg, args)
 	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 		setAudioVolume(connectedChannel, args[1])
 	else
-		sendMessage(msg.channel.id, "Usage: volume <0 - 1>")
+		sendMessage(msg.channel.id, "[INFO] Usage: volume <0 - 1>")
 	end
 end)
 
@@ -75,9 +75,9 @@ addCommand("joinVoice", function(msg, args)
 						return
 					end
 				end
-				sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
+				sendMessage(msg.channel.id, "[INFO] Could not find channel: \""..args[1].."\"")
 			else
-				local message = "Multiple channels found: \n"
+				local message = "[INFO] Multiple channels found: \n"
 				
 				for k,v in pairs(voiceChannels) do
 					message = message .. v.name .. "\n"
@@ -89,7 +89,7 @@ addCommand("joinVoice", function(msg, args)
 			joinVoiceChannel(voiceChannels[1].id)
 			connectedChannel = v.id
 		else
-			sendMessage(msg.channel.id, "No voicechannels found.")
+			sendMessage(msg.channel.id, "[INFO] No voicechannels found.")
 		end
 	end
 end)

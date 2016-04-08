@@ -14,7 +14,7 @@ function onMessageReceived(msg)
 end
 
 function onLuaError(reason)
-	sendMessage(mainChannel, "An error occured while running the script:\n"..reason)
+	sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..reason)
 end
 
 function onPortData(data)
@@ -38,7 +38,7 @@ function handleMessage(msg)
 				chatCommands[command](msg, args) -- call command with msg and arguments
 				--deleteMessage(msg.channel.id, msg.id) -- remove command message
 			else
-				sendMessage(msg.channel.id, "["..botName.."] Unknown command.")
+				sendMessage(msg.channel.id, "[INFO] Unknown command.")
 			end
 		end
 	end
@@ -102,7 +102,7 @@ function handleMessageOld(msg)
 			end
 			
 			if (not commandExist) then -- If command wasn't existing
-				sendMessage(msg.channel.id, "["..botName.."] Unknown command.")
+				sendMessage(msg.channel.id, "[INFO] Unknown command.")
 			end
 		end
 	end
@@ -115,7 +115,7 @@ function isAdmin(msg)
 			return true
 		end
 	end
-	sendMessage(msg.channel.id, "["..botName.."] Admin-Only Command")
+	sendMessage(msg.channel.id, "[INFO] Admin-Only Command.")
 	return false
 end
 
@@ -140,7 +140,7 @@ addCommand("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
-			sendMessage(mainChannel, "["..botName.."] An error occured while running the script:\n"..errorStr)
+			sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
@@ -169,7 +169,7 @@ function loadLibs()
 	for file in string.gmatch(lsStr, "%a+.lua") do 
 		func, errorStr = loadfile(libPath..file) 
 		if(func == nil) then
-			sendMessage(mainChannel, "[INIT] Error loading library ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[INIT][ERROR] Error loading library ("..file.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Library ("..file..") loaded!")
@@ -184,7 +184,7 @@ function loadModules()
 	for file in string.gmatch(lsStr, "%a+.lua") do 
 		func, errorStr = loadfile(modulePath..file) 
 		if(func == nil) then
-			sendMessage(mainChannel, "[INIT] Error loading module ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[INIT][ERROR] Error loading module ("..file.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Module ("..file..") loaded!")
@@ -195,6 +195,6 @@ end
 loadLibs()			-- Load essential libraries
 loadModules()		-- Load additional modules
 
-sendMessage(mainChannel, "["..botName.."] Initialized!")
+sendMessage(mainChannel, "[INFO] Initialized!")
 
 hook.Add("onMessageReceived", "messageHandler", handleMessage)
