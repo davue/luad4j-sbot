@@ -1,7 +1,6 @@
-installPath = "/home/pi/discord/lua"
-defaultFilePath = installPath.."/main.lua"
-libPath = installPath.."/lib/"
-modulePath = installPath.."/modules/"
+luaPath = "lua/"
+libPath = luaPath .. "lib/"
+modulePath = luaPath .. "modules/"
 mainChannel = "165560868426219520" -- #stammbot-dev-channel @ Stammgruppe Afterbirth
 
 ------------------------
@@ -43,8 +42,8 @@ sendMessage(mainChannel, "[INFO] Initialized!")
 -----------------------------
 command.add("update", function(msg, args)
 	if(core.isAdmin(msg)) then
-		os.execute("git -C ".. installPath .." reset --hard")
-		local text = os.capture("git -C ".. installPath .." pull")
+		os.execute("git -C ".. luaPath .." reset --hard")
+		local text = os.capture("git -C ".. luaPath .." pull")
 		if (text ~= "Already up-to-date.") then
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
