@@ -5,7 +5,7 @@ voters = {}
 votecount = 1
 
 command.add("startvote", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		if(#args >= 4) then
 			-- clearen
 			answers = {}

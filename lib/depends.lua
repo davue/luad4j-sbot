@@ -15,7 +15,7 @@ depends.moduleLoaded(string: name)
 	Returns whether a module was loaded.
 ]]
 
-depends = {} 								-- Table containing depends libraries
+depends = {} 								-- Table containing depends library
 local loaded = {libs = {}, modules = {}}	-- Table containing names of loaded libraries
 
 function os.capture(cmd, raw)
@@ -50,7 +50,7 @@ function depends.onModule(name)
 			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading module ("..name.."):\n"..errorStr)
 		else
 			func()
-			print("[LUA] Library ("..name..") loaded!")
+			print("[LUA] Module ("..name..") loaded!")
 			table.insert(loaded["modules"], name)
 			return true
 		end

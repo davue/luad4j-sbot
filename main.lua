@@ -4,8 +4,6 @@ libPath = installPath.."/lib/"
 modulePath = installPath.."/modules/"
 mainChannel = "165560868426219520" -- #stammbot-dev-channel @ Stammgruppe Afterbirth
 
-local admins = {"163605020271575041"} -- Dave-it
-
 ------------------------
 ---- Initialization ----
 ------------------------
@@ -44,7 +42,7 @@ sendMessage(mainChannel, "[INFO] Initialized!")
 ---- Vital Chat Commands ----
 -----------------------------
 command.add("update", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		os.execute("git -C ".. installPath .." reset --hard")
 		local text = os.capture("git -C ".. installPath .." pull")
 		if (text ~= "Already up-to-date.") then
@@ -60,7 +58,7 @@ command.add("update", function(msg, args)
 end)
 
 command.add("reload", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then
 			sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..errorStr)

@@ -51,7 +51,7 @@ command.add("resume", function(msg, args)
 end)
 
 command.add("joinVoice", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		if (connectedChannel ~= nil) then
 			chatCommands["leaveVoice"](msg)
 		end
@@ -88,7 +88,7 @@ command.add("joinVoice", function(msg, args)
 end)
 
 command.add("leaveVoice", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		if(connectedChannel ~= nil) then
 			leaveVoiceChannel(connectedChannel)
 			connectedChannel = nil
@@ -110,7 +110,7 @@ command.add("skip", function(msg, args)
 end)
 
 command.add("fskip", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		skipAudio(connectedChannel)
 	end
 end)

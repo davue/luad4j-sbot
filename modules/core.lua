@@ -27,7 +27,7 @@ command.add("ping", function(msg, args)
 end)
 
 command.add("lua", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		if(#args > 0) then
 			local luaCommand = string.sub(msg.text, 6)
 			if(luaCommand ~= "") then
@@ -45,7 +45,7 @@ command.add("lua", function(msg, args)
 end)
 
 command.add("sh", function(msg, args)
-	if(isAdmin(msg)) then
+	if(core.isAdmin(msg)) then
 		if(#args > 0) then
 			local output = tostring(os.capture(string.sub(msg.text,5), true))
 			if(output ~= "") then
