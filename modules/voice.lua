@@ -68,10 +68,9 @@ addCommand("joinVoice", function(msg, args)
 					if (v.name == args[1]) then
 						joinVoiceChannel(v.id)
 						connectedChannels = v.id
-						break
-					else
-						sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
+						return
 					end
+					sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
 				end
 			else
 				local message = "Multiple channels found: \n"
@@ -102,10 +101,9 @@ addCommand("leaveVoice", function(msg, args)
 					if (v.name == args[1]) then
 						leaveVoiceChannel(v.id)
 						connectedChannels = v.id
-						break
-					else
-						sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
+						return
 					end
+					sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
 				end
 			else
 				local message = "Multiple channels found: \n"
