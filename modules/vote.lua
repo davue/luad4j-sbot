@@ -74,7 +74,7 @@ command.add("vote", function(msg, args)
 	end
 end)
 
-command.Add("showvote", function(msg, args)
+command.add("showvote", function(msg, args)
 	local message = "["..botName.."] Vote: \n---- "..question.." ----\n"
 	
 	for k, v in pairs(answers) do
