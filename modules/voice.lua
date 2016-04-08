@@ -70,8 +70,8 @@ addCommand("joinVoice", function(msg, args)
 						connectedChannel = v.id
 						return
 					end
-					sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
 				end
+				sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
 			else
 				local message = "Multiple channels found: \n"
 				
