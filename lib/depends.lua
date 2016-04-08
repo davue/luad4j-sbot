@@ -31,13 +31,13 @@ end
 
 function depends.onLib(name)
 	if(not depends.libLoaded(name)) then
-		func, errorStr = loadfile(libPath..file..".lua") 
+		func, errorStr = loadfile(libPath..name..".lua") 
 		if(func == nil) then
-			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading library ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading library ("..name.."):\n"..errorStr)
 		else
 			func()
-			print("[LUA] Library ("..file..") loaded!")
-			table.insert(loaded["libs"], file)
+			print("[LUA] Library ("..name..") loaded!")
+			table.insert(loaded["libs"], name)
 			return true
 		end
 	end
@@ -45,13 +45,13 @@ end
 
 function depends.onModule(name)
 	if(not depends.moduleLoaded(name)) then
-		func, errorStr = loadfile(modulePath..file..".lua") 
+		func, errorStr = loadfile(modulePath..name..".lua") 
 		if(func == nil) then
-			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading module ("..file.."):\n"..errorStr)
+			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading module ("..name.."):\n"..errorStr)
 		else
 			func()
-			print("[LUA] Library ("..file..") loaded!")
-			table.insert(loaded["modules"], file)
+			print("[LUA] Library ("..name..") loaded!")
+			table.insert(loaded["modules"], name)
 			return true
 		end
 	end

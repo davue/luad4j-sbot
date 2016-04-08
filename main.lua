@@ -15,6 +15,7 @@ function loadDependencyManager()
 		sendMessage(mainChannel, "[INIT][ERROR] An error occured while loading dependency manager:\n"..errorStr)
 	else
 		func()
+		print("[LUA] Dependency manager loaded!")
 	end
 end
 
