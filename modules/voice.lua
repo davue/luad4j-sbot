@@ -67,7 +67,7 @@ addCommand("joinVoice", function(msg, args)
 				for k,v in pairs(voiceChannels) do
 					if (v.name == args[1]) then
 						joinVoiceChannel(v.id)
-						connectedChannels = v.id
+						connectedChannel = v.id
 						return
 					end
 					sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
@@ -83,7 +83,7 @@ addCommand("joinVoice", function(msg, args)
 			end
 		elseif(#voiceChannels == 1) then
 			joinVoiceChannel(voiceChannels[1].id)
-			connectedChannels = v.id
+			connectedChannel = v.id
 		else
 			sendMessage(msg.channel.id, "No voicechannels found.")
 		end
@@ -92,34 +92,7 @@ end)
 
 addCommand("leaveVoice", function(msg, args)
 	if(isAdmin(msg)) then
-		local voiceChannels = getVoiceChannels(msg.guild.id)
-		local err = nil;
-		
-		if(#voiceChannels > 1) then
-			if(#args >= 1) then
-				for k,v in pairs(voiceChannels) do
-					if (v.name == args[1]) then
-						leaveVoiceChannel(v.id)
-						connectedChannels = v.id
-						return
-					end
-					sendMessage(msg.channel.id, "Could not find channel: \""..args[1].."\"")
-				end
-			else
-				local message = "Multiple channels found: \n"
-				
-				for k,v in pairs(voiceChannels) do
-					message = message .. v.name .. "\n"
-				end
-			
-				sendMessage(msg.channel.id, message)
-			end
-		elseif(#voiceChannels == 1) then
-			leaveVoiceChannel(voiceChannels[1].id)
-			connectedChannels = v.id
-		else
-			sendMessage(msg.channel.id, "No voicechannels found.")
-		end
+		leaveVoiceChannel(connectedChannel)
 	end
 end)
 
