@@ -31,7 +31,7 @@ command.add("addURL", function(msg, args)
 end)
 
 command.add("stop", function(msg, args)
-	clearQueue(getVoiceChannels(msg.guild.id)[1].id)
+	clearQueue(connectedChannel)
 end)
 
 command.add("volume", function(msg, args)
