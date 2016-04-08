@@ -5,6 +5,8 @@ This modules provides functions to interact with the voice channel
 
 ]]
 
+local connectedChannels = {}
+
 addCommand("add", function(msg, args)
 	if(#args == 1) then
 		queueFile(getVoiceChannels(msg.guild.id)[1].id, args[1])
@@ -43,7 +45,33 @@ end)
 
 addCommand("joinVoice", function(msg, args)
 	if(isAdmin(msg)) then
-		joinVoiceChannel(getVoiceChannels(msg.guild.id)[1].id)
+		local voiceChannels = getVoiceChannels(msg.guild.id)
+		
+		if(#voiceChannels > 1) then
+			if(#args > 1) then
+				for k,v in pairs(voiceChannels) do
+					if (v.name == args[2]) then
+						joinVoiceChannel(v.id)
+						table.insert(connectedChannels, v.id)
+					else
+						sendMessage(msg.channel.id, "Could not find channel: \""..args[2].."\"")
+					end
+				end
+			else
+				local message = "Multiple channels found: \n"
+				
+				for k,v in pairs(voiceChannels) do
+					message = message .. v.name .. "\n"
+				end
+			
+				sendMessage(msg.channel.id, message)
+			end
+		elseif(#voiceChannels == 1) then
+			joinVoiceChannel(voiceChannels[1].id)
+			table.insert(connectedChannels, voiceChannels[1].id)
+		else
+			sendMessage(msg.channel.id, "No voicechannels found.")
+		end
 	end
 end)
 
@@ -60,4 +88,14 @@ addCommand("lssounds", function(msg, args)
 		soundlist = soundlist .. file .. "\r\n"
 	end
 	sendMessage(msg.channel.id, soundlist)
+end)
+
+addCommand("skip", function(msg, args)
+	
+end)
+
+addCommand("fskip", function(msg, args)
+	if(isAdmin(msg)) then
+		skipAudio(getVoiceChannels(msg.guild.id)[1].id)
+	end
 end)

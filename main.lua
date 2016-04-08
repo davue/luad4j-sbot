@@ -1,6 +1,6 @@
 chatCommands = {} -- chatCommands[command] = function of command
 botName = "S-Bot"
-installPath = "/home/Dave/discord/lua"
+installPath = "/home/pi/discord/lua"
 defaultFilePath = installPath.."/main.lua"
 libPath = installPath.."/lib/"
 modulePath = installPath.."/modules/"
@@ -36,7 +36,7 @@ function handleMessage(msg)
 		
 			if(chatCommands[command] ~= nil) then -- if command exists
 				chatCommands[command](msg, args) -- call command with msg and arguments
-				deleteMessage(msg.channel.id, msg.id) -- remove command message
+				--deleteMessage(msg.channel.id, msg.id) -- remove command message
 			else
 				sendMessage(msg.channel.id, "["..botName.."] Unknown command.")
 			end
