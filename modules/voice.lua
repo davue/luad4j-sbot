@@ -1,13 +1,6 @@
---[[ Voice module - Docs:
-This modules provides functions to interact with the voice channel
-
-
-
-]]
-
 local connectedChannel = nil
 
-addCommand("add", function(msg, args)
+command.Add("add", function(msg, args)
 	if(#args == 1) then
 		err = queueFile(connectedChannel, args[1])
 		if(err ~= nil) then
@@ -22,7 +15,7 @@ addCommand("add", function(msg, args)
 	end
 end)
 
-addCommand("addURL", function(msg, args)
+command.Add("addURL", function(msg, args)
 	if(#args == 1) then
 		err = queueURL(connectedChannel, args[1])
 		if(err ~= nil) then
@@ -37,11 +30,11 @@ addCommand("addURL", function(msg, args)
 	end
 end)
 
-addCommand("stop", function(msg, args)
+command.Add("stop", function(msg, args)
 	clearQueue(getVoiceChannels(msg.guild.id)[1].id)
 end)
 
-addCommand("volume", function(msg, args)
+command.Add("volume", function(msg, args)
 	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 		setAudioVolume(connectedChannel, args[1])
 	else
@@ -49,15 +42,15 @@ addCommand("volume", function(msg, args)
 	end
 end)
 
-addCommand("pause", function(msg, args)
+command.Add("pause", function(msg, args)
 	pauseAudio(connectedChannel)
 end)
 
-addCommand("resume", function(msg, args)
+command.Add("resume", function(msg, args)
 	resumeAudio(connectedChannel)
 end)
 
-addCommand("joinVoice", function(msg, args)
+command.Add("joinVoice", function(msg, args)
 	if(isAdmin(msg)) then
 		if (connectedChannel ~= nil) then
 			chatCommands["leaveVoice"](msg)
@@ -94,7 +87,7 @@ addCommand("joinVoice", function(msg, args)
 	end
 end)
 
-addCommand("leaveVoice", function(msg, args)
+command.Add("leaveVoice", function(msg, args)
 	if(isAdmin(msg)) then
 		if(connectedChannel ~= nil) then
 			leaveVoiceChannel(connectedChannel)
@@ -103,7 +96,7 @@ addCommand("leaveVoice", function(msg, args)
 	end
 end)
 
-addCommand("lssounds", function(msg, args)
+command.Add("lssounds", function(msg, args)
 	lsStr = os.capture("ls sounds")
 	soundlist = ""
 	for file in string.gmatch(lsStr, "%a+.wav") do 
@@ -112,11 +105,11 @@ addCommand("lssounds", function(msg, args)
 	sendMessage(msg.channel.id, soundlist)
 end)
 
-addCommand("skip", function(msg, args)
+command.Add("skip", function(msg, args)
 	
 end)
 
-addCommand("fskip", function(msg, args)
+command.Add("fskip", function(msg, args)
 	if(isAdmin(msg)) then
 		skipAudio(connectedChannel)
 	end

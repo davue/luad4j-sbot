@@ -4,7 +4,7 @@ answers = {}
 voters = {}
 votecount = 1
 
-addCommand("startvote", function(msg, args)
+command.Add("startvote", function(msg, args)
 	if(isAdmin(msg)) then
 		if(#args >= 4) then
 			-- clearen
@@ -36,7 +36,7 @@ addCommand("startvote", function(msg, args)
 	end
 end)
 
-addCommand("vote", function(msg, args)
+command.Add("vote", function(msg, args)
 	if(#args == 1) then
 		
 		local voterid = 1
@@ -74,7 +74,7 @@ addCommand("vote", function(msg, args)
 	end
 end)
 
-addCommand("showvote", function(msg, args)
+command.Add("showvote", function(msg, args)
 	local message = "["..botName.."] Vote: \n---- "..question.." ----\n"
 	
 	for k, v in pairs(answers) do

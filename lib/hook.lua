@@ -1,6 +1,4 @@
-hook = {}	-- Table containing the hook library
-
---[[ Docs:
+--[[ Hook Lib - Docs:
 The hook library gives you several functions to easily manage and implement events. You can "hook" functions
 to an event and whenever that event gets called, all the hooked functions will be executed.
 
@@ -20,6 +18,7 @@ hook.GetTable()
 	Returns the hook table containing all hooks.
 ]]
 
+hook = {}	-- Table containing the hook library
 local hookTable = {} -- Table containing all hooks
 
 function hook.Add(eventName, identifier, func)

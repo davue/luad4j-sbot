@@ -1,4 +1,4 @@
---[[ Docs:
+--[[ Command Lib - Docs:
 The command library contains the chat command handling of the bot
 
 command.Add(string: command, function: cb_func)

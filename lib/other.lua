@@ -1,4 +1,4 @@
---[[ Docs:
+--[[ Other Lib - Docs:
 This library is just a random collection of functions which don't fit into another library.
 
 deepcopy(variable)
