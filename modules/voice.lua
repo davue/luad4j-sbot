@@ -53,7 +53,7 @@ end)
 command.add("joinVoice", function(msg, args)
 	if(core.isAdmin(msg)) then
 		if (connectedChannel ~= nil) then
-			chatCommands["leaveVoice"](msg)
+			command.getTable()["leaveVoice"](msg)
 		end
 		
 		local voiceChannels = getVoiceChannels(msg.guild.id)
