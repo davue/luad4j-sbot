@@ -43,7 +43,7 @@ sendMessage(mainChannel, "[INFO] Initialized!")
 -----------------------------
 ---- Vital Chat Commands ----
 -----------------------------
-command.Add("update", function(msg, args)
+command.add("update", function(msg, args)
 	if(isAdmin(msg)) then
 		os.execute("git -C ".. installPath .." reset --hard")
 		local text = os.capture("git -C ".. installPath .." pull")
@@ -59,7 +59,7 @@ command.Add("update", function(msg, args)
 	end
 end)
 
-command.Add("reload", function(msg, args)
+command.add("reload", function(msg, args)
 	if(isAdmin(msg)) then
 		func, errorStr = loadfile(defaultFilePath)
 		if(func == nil) then

@@ -19,16 +19,16 @@ command.Call(string: command, table: msg, table: args)
 command = {} -- Table containing the commmand library
 local chatCommands = {} -- chatCommands[command] = function of command
 
-function command.Add(command, func)
+function command.add(command, func)
 	chatCommands[command] = func
 end
 
-function command.Remove(command)
+function command.remove(command)
 	chatCommands[command] = nil
 end
 
-function command.Call(command, msg, args)
-	chatCommands[command](msg, args)
+function command.getTable()
+	return chatCommands
 end
 
 local function handleMessage(msg)

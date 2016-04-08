@@ -22,11 +22,11 @@ about
 	Displays a short message naming the developers
 ]]
 
-command.Add("ping", function(msg, args)
+command.add("ping", function(msg, args)
 	sendMessage(msg.channel.id, "Pong!")
 end)
 
-command.Add("lua", function(msg, args)
+command.add("lua", function(msg, args)
 	if(isAdmin(msg)) then
 		if(#args > 0) then
 			local luaCommand = string.sub(msg.text, 6)
@@ -44,7 +44,7 @@ command.Add("lua", function(msg, args)
 	end
 end)
 
-command.Add("sh", function(msg, args)
+command.add("sh", function(msg, args)
 	if(isAdmin(msg)) then
 		if(#args > 0) then
 			local output = tostring(os.capture(string.sub(msg.text,5), true))
@@ -59,7 +59,7 @@ command.Add("sh", function(msg, args)
 	end
 end)
 
-command.Add("help", function(msg, args)
+command.add("help", function(msg, args)
 	local cmds = ""
 	for key, value in pairs(chatCommands) do
 		if key ~= "getuser" then

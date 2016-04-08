@@ -30,11 +30,11 @@ command.Add("addURL", function(msg, args)
 	end
 end)
 
-command.Add("stop", function(msg, args)
+command.add("stop", function(msg, args)
 	clearQueue(getVoiceChannels(msg.guild.id)[1].id)
 end)
 
-command.Add("volume", function(msg, args)
+command.add("volume", function(msg, args)
 	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 		setAudioVolume(connectedChannel, args[1])
 	else
@@ -42,15 +42,15 @@ command.Add("volume", function(msg, args)
 	end
 end)
 
-command.Add("pause", function(msg, args)
+command.add("pause", function(msg, args)
 	pauseAudio(connectedChannel)
 end)
 
-command.Add("resume", function(msg, args)
+command.add("resume", function(msg, args)
 	resumeAudio(connectedChannel)
 end)
 
-command.Add("joinVoice", function(msg, args)
+command.add("joinVoice", function(msg, args)
 	if(isAdmin(msg)) then
 		if (connectedChannel ~= nil) then
 			chatCommands["leaveVoice"](msg)
@@ -87,7 +87,7 @@ command.Add("joinVoice", function(msg, args)
 	end
 end)
 
-command.Add("leaveVoice", function(msg, args)
+command.add("leaveVoice", function(msg, args)
 	if(isAdmin(msg)) then
 		if(connectedChannel ~= nil) then
 			leaveVoiceChannel(connectedChannel)
@@ -96,7 +96,7 @@ command.Add("leaveVoice", function(msg, args)
 	end
 end)
 
-command.Add("lssounds", function(msg, args)
+command.add("lssounds", function(msg, args)
 	lsStr = os.capture("ls sounds")
 	soundlist = ""
 	for file in string.gmatch(lsStr, "%a+.wav") do 
@@ -105,14 +105,14 @@ command.Add("lssounds", function(msg, args)
 	sendMessage(msg.channel.id, soundlist)
 end)
 
-command.Add("skip", function(msg, args)
+command.add("skip", function(msg, args)
 	
 end)
 
-command.Add("fskip", function(msg, args)
+command.add("fskip", function(msg, args)
 	if(isAdmin(msg)) then
 		skipAudio(connectedChannel)
 	end
 end)
 
-hook.Add("lua_onReload", "", chatCommands["leaveVoice"])
+hook.Add("lua_onReload", "kickFromVoice", command.getTable["leaveVoice"])

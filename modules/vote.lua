@@ -4,7 +4,7 @@ answers = {}
 voters = {}
 votecount = 1
 
-command.Add("startvote", function(msg, args)
+command.add("startvote", function(msg, args)
 	if(isAdmin(msg)) then
 		if(#args >= 4) then
 			-- clearen
@@ -36,7 +36,7 @@ command.Add("startvote", function(msg, args)
 	end
 end)
 
-command.Add("vote", function(msg, args)
+command.add("vote", function(msg, args)
 	if(#args == 1) then
 		
 		local voterid = 1
