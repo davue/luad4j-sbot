@@ -9,7 +9,7 @@ core = {}	-- Table containing core library
 local admins = {"163605020271575041"} -- Dave-it
 
 function core.isAdmin(msg)
-	for k, v in pairs(admin) do
+	for k, v in pairs(admins) do
 		if (msg.author.id == v) then
 			return true
 		end
