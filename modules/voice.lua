@@ -9,8 +9,7 @@ local connectedChannel = ""
 
 addCommand("add", function(msg, args)
 	if(#args == 1) then
-		local err = nil
-		if(err = queueFile(connectedChannel, args[1]) != nil) then
+		if((err = queueFile(connectedChannel, args[1])) != nil) then
 			if(err == "DiscordException") then
 				sendMessage(msg.channel.id, "I am not in a channel yet.")
 			else
@@ -24,8 +23,7 @@ end)
 
 addCommand("addURL", function(msg, args)
 	if(#args == 1) then
-		local err = nil
-		if(err = queueURL(connectedChannel, args[1]) != nil) then
+		if((err = queueURL(connectedChannel, args[1])) != nil) then
 			if(err == "DiscordException") then
 				sendMessage(msg.channel.id, "I am not in a channel yet.")
 			else
