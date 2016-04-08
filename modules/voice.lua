@@ -5,7 +5,7 @@ This modules provides functions to interact with the voice channel
 
 ]]
 
-local connectedChannel = ""
+local connectedChannel = nil
 
 addCommand("add", function(msg, args)
 	if(#args == 1) then
@@ -59,6 +59,10 @@ end)
 
 addCommand("joinVoice", function(msg, args)
 	if(isAdmin(msg)) then
+		if (connectedChannel ~= nil) then
+			chatCommands["leaveVoice"](msg)
+		end
+		
 		local voiceChannels = getVoiceChannels(msg.guild.id)
 		local err = nil;
 		
@@ -93,6 +97,7 @@ end)
 addCommand("leaveVoice", function(msg, args)
 	if(isAdmin(msg)) then
 		leaveVoiceChannel(connectedChannel)
+		connectedChannel = nil
 	end
 end)
 
@@ -115,9 +120,4 @@ addCommand("fskip", function(msg, args)
 	end
 end)
 
--- leave all open voice channels on module loads
-for k, guild in pairs(getGuilds()) do
-	for k, channel in pairs(getVoiceChannels(guild.id)) do
-		leaveVoiceChannel(channel.id)
-	end
-end
+hook.Add("lua_onReload", "", chatCommands["leaveVoice"])

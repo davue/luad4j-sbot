@@ -144,6 +144,8 @@ addCommand("reload", function(msg, args)
 		else
 			func()
 		end
+		
+		hook.Call("lua_onReload", msg)
 	end
 end)
 
