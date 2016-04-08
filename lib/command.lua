@@ -41,7 +41,7 @@ local function handleMessage(msg)
 		
 			if(chatCommands[command] ~= nil) then -- If command exists
 				chatCommands[command](msg, args) -- Call command with msg and arguments
-				deleteMessage(msg.channel.id, msg.id) -- Remove command message
+				--deleteMessage(msg.channel.id, msg.id) -- Remove command message
 			else
 				sendMessage(msg.channel.id, "[INFO] Unknown command.")
 			end
