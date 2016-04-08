@@ -6,12 +6,15 @@ core.isAdmin(table: msg)
 ]]
 
 core = {}	-- Table containing core library
-local admins = {"163605020271575041"} -- Dave-it
+local admins = {"S-Bot Dev"} -- All roles with admin access
 
 function core.isAdmin(msg)
-	for k, v in pairs(admins) do
-		if (msg.author.id == v) then
-			return true
+	for k, aRole in pairs(admins) do
+		local userRoles = getRoles(msg.author.id, msg.guild.id)
+		for k, uRole in pairs(userRoles) do
+			if(aRole == uRole.name) then
+				return true
+			end
 		end
 	end
 	
