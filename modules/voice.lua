@@ -18,9 +18,9 @@ end
 command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
-			queueURL(connectedChannel, "https://api.soundcloud.com/tracks/".. args[1] .."/stream?client_id=8636d6f035e7bf068c9539991e255098")
+			queueURL(connectedChannel, "http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 		else
-			sendMessage(msg.channel.id, "[INFO] Usage: sc <trackid>")
+			sendMessage(msg.channel.id, "[INFO] Usage: sc <url>")
 		end
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
