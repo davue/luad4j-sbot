@@ -19,7 +19,7 @@ command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
 			queueURL(connectedChannel, "http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
-			deleteMessage(msg.id)
+			deleteMessage(msg.channel.id, msg.id)
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: sc <url>")
 		end
@@ -32,7 +32,7 @@ command.add("addFile", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
 			queueFile(connectedChannel, args[1])
-			deleteMessage(msg.id)
+			deleteMessage(msg.channel.id, msg.id)
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
 		end
@@ -45,7 +45,7 @@ command.add("addURL", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
 			queueURL(connectedChannel, args[1])
-			deleteMessage(msg.id)
+			deleteMessage(msg.channel.id, msg.id)
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: add <soundURL>")
 		end
