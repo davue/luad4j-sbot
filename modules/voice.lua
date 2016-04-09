@@ -15,6 +15,18 @@ local function isInChannel(guild, channelname)
 	return false
 end
 
+command.add("sc", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			queueFile(connectedChannel, "https://api.soundcloud.com/tracks/".. args[1] .."/stream?client_id=8636d6f035e7bf068c9539991e255098")
+		else
+			sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
+		end
+	else
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+	end
+end)
+
 command.add("addFile", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
