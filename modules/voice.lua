@@ -1,98 +1,150 @@
 local connectedChannel = nil
 
-command.add("add", function(msg, args)
-	if(#args == 1) then
-		err = queueFile(connectedChannel, args[1])
-		if(err ~= nil) then
-			if(err == "DiscordException") then
-				sendMessage(msg.channel.id, "[INFO] I am not in a channel yet.")
-			else
-				sendMessage(msg.channel.id, "[ERROR] An unknown error occured.")
+local function isInChannel(guild, channelname)
+	voiceChannels = getVoiceChannels(guild)
+	connectedChannels = getConnectedVoiceChannels()
+	
+	for k, conChannel in pairs(connectedChannels) do
+		for i, channel in pairs(voiceChannels) do
+			if(conChannel.id == channel.id and channelname == channel.name) then
+				return true
 			end
 		end
+	end
+	
+	return false
+end
+
+command.add("addFile", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			queueFile(connectedChannel, args[1])
+		else
+			sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
+		end
 	else
-		sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
 end)
 
 command.add("addURL", function(msg, args)
-	if(#args == 1) then
-		err = queueURL(connectedChannel, args[1])
-		if(err ~= nil) then
-			if(err == "DiscordException") then
-				sendMessage(msg.channel.id, "[INFO] I am not in a channel yet.")
-			else
-				sendMessage(msg.channel.id, "[ERROR] An unknown error occured.")
-			end
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			queueURL(connectedChannel, args[1])
+		else
+			sendMessage(msg.channel.id, "[INFO] Usage: add <soundURL>")
 		end
 	else
-		sendMessage(msg.channel.id, "[INFO] Usage: addURL <soundurl>")
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
 end)
 
 command.add("stop", function(msg, args)
-	clearQueue(connectedChannel)
+	if(connectedChannel ~= nil) then
+		clearQueue(connectedChannel, args[1])
+	else
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+	end
 end)
 
 command.add("volume", function(msg, args)
-	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
-		setAudioVolume(connectedChannel, args[1])
+	if(connectedChannel ~= nil) then
+		if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
+			setAudioVolume(connectedChannel, args[1])
+		else
+			sendMessage(msg.channel.id, "[INFO] Usage: volume <0 - 1>")
+		end
 	else
-		sendMessage(msg.channel.id, "[INFO] Usage: volume <0 - 1>")
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
 end)
 
 command.add("pause", function(msg, args)
-	pauseAudio(connectedChannel)
-end)
-
-command.add("resume", function(msg, args)
-	resumeAudio(connectedChannel)
-end)
-
-command.add("joinVoice", function(msg, args)
-	if(core.isAdmin(msg)) then
-		if (connectedChannel ~= nil) then
-			command.getTable()["leaveVoice"](msg)
-		end
-		
-		local voiceChannels = getVoiceChannels(msg.guild.id)
-		local err = nil;
-		
-		if(#voiceChannels > 1) then
-			if(#args >= 1) then
-				for k,v in pairs(voiceChannels) do
-					if (v.name == args[1]) then
-						joinVoiceChannel(v.id)
-						connectedChannel = v.id
-						return
-					end
-				end
-				sendMessage(msg.channel.id, "[INFO] Could not find channel: \""..args[1].."\"")
-			else
-				local message = "[INFO] Multiple channels found: \n"
-				
-				for k,v in pairs(voiceChannels) do
-					message = message .. v.name .. "\n"
-				end
-			
-				sendMessage(msg.channel.id, message)
-			end
-		elseif(#voiceChannels == 1) then
-			joinVoiceChannel(voiceChannels[1].id)
-			connectedChannel = v.id
-		else
-			sendMessage(msg.channel.id, "[INFO] No voicechannels found.")
-		end
+	if(connectedChannel ~= nil) then
+		pauseAudio(connectedChannel)
+	else
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
 end)
 
-command.add("leaveVoice", function(msg, args)
+command.add("resume", function(msg, args)
+	if(connectedChannel ~= nil) then
+		resumeAudio(connectedChannel)
+	else
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+	end
+end)
+
+command.add("join", function(msg, args)
 	if(core.isAdmin(msg)) then
-		if(connectedChannel ~= nil) then
-			leaveVoiceChannel(connectedChannel)
-			connectedChannel = nil
+		voiceChannels = getVoiceChannels(msg.guild.id)
+		connectedChannels = getConnectedVoiceChannels()
+		
+		if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
+			if(not isConnectedToVoice(voiceChannels[1].id)) then
+				joinVoiceChannel(voiceChannels[1].id)
+				connectedChannel = voiceChannels[1].id
+			else
+				sendMessage(msg.channel.id, "[INFO] Bot is already in the voice channel.")
+			end
+		elseif(#voiceChannels >= 1) then -- if there are more than one voice channels
+			if(#args == 1) then -- when there are one or more arguments passed
+				channelExists = false;
+				alreadyInChannel = false;
+				
+				for k, channel in pairs(voiceChannels) do
+					for i, conChannel in pairs(connectedChannels) do
+						if(channel.id == conChannel.id) then -- if you are already in a channel of the same server
+							channelExists = true
+							alreadyInChannel = true
+							if(channel.name == args[1]) then -- if it's the same channel you want to join
+								sendMessage(msg.channel.id, "[INFO] You are already in this voice channel.")
+								break
+							else
+								sendMessage(msg.channel.id, "[INFO] You are already in the voice channel: \"".. channel.name .."\".\n[INFO] You can only join one channel per server.")
+								break
+							end
+						end
+					end
+					
+					if(args[1] == channel.name and not alreadyInChannel) then -- if there is a channel with name <arg>
+						if(not isConnectedToVoice(voiceChannels[k].id)) then
+							joinVoiceChannel(voiceChannels[k].id)
+							connectedChannel = voiceChannels[1].id
+							channelExists = true
+							break
+						end
+					end
+				end
+				
+				if(not channelExists) then
+					message = message .."[INFO] There is no channel called: \"".. arg[1] .."\".\n"
+				end
+			elseif(#args >= 1) then
+				sendMessage(msg.channel.id, "[INFO] You can only join one channel per server.")
+			else -- need one arg to specify channel to leave
+				sendMessage(msg.channel.id, "[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: joinVoice <channel>")
+			end
+		else
+			sendMessage(msg.channel.id, "[INFO] There are no voice channels on this server.")
 		end
+	else
+		sendMessage(msg.channel.id, "[INFO] Admin-only command.")
+	end
+end)
+
+command.add("leave", function(msg, args)
+	if(core.isAdmin(msg)) then
+		local voiceChannels = getVoiceChannels(msg.guild.id)
+
+		for i, channel in pairs(voiceChannels) do
+			if(isConnectedToVoice(channel.id)) then
+				leaveVoiceChannel(channel.id)
+				connectedChannel = nil
+			end
+		end
+	else
+		sendMessage(msg.channel.id, "[INFO] Admin-only command.")
 	end
 end)
 
@@ -111,8 +163,23 @@ end)
 
 command.add("fskip", function(msg, args)
 	if(core.isAdmin(msg)) then
-		skipAudio(connectedChannel)
+		if(connectedChannel ~= nil) then
+			skipAudio(connectedChannels)
+		else
+			sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+		end
 	end
 end)
 
-hook.Add("lua_onReload", "kickFromVoice", command.getTable()["leaveVoice"])
+-- Leave all voice channels on reload
+local guilds = getGuilds()
+for k, guild in pairs(guilds) do
+	local voiceChannels = getVoiceChannels(guild.id)
+
+	for i, channel in pairs(voiceChannels) do
+		if(isConnectedToVoice(channel.id)) then
+			leaveVoiceChannel(channel.id)
+			connectedChannel = nil
+		end
+	end
+end

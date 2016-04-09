@@ -35,7 +35,7 @@ loadDependencyManager() -- Load dependency manager
 loadLibs()				-- Load essential libraries
 loadModules()			-- Load additional modules
 
-sendMessage(mainChannel, "[INFO] Initialized!")
+--sendMessage(mainChannel, "[INFO] Initialized!")
 
 -----------------------------
 ---- Vital Chat Commands ----
