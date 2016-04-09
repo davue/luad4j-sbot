@@ -24,6 +24,7 @@ command.add("sc", function(msg, args)
 		end
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+		deleteMessage(msg.id)
 	end
 end)
 
@@ -36,6 +37,7 @@ command.add("addFile", function(msg, args)
 		end
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+		deleteMessage(msg.id)
 	end
 end)
 
@@ -48,6 +50,7 @@ command.add("addURL", function(msg, args)
 		end
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+		deleteMessage(msg.id)
 	end
 end)
 
