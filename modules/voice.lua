@@ -164,7 +164,7 @@ end)
 command.add("fskip", function(msg, args)
 	if(core.isAdmin(msg)) then
 		if(connectedChannel ~= nil) then
-			skipAudio(connectedChannels)
+			skipAudio(connectedChannel)
 		else
 			sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 		end
