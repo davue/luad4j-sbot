@@ -1,5 +1,8 @@
 local connectedChannel = nil
 
+-- Skip functionality variables
+skippers = {}
+
 local function isInChannel(guild, channelname)
 	voiceChannels = getVoiceChannels(guild)
 	connectedChannels = getConnectedVoiceChannels()
@@ -176,7 +179,17 @@ command.add("lssounds", function(msg, args)
 end)
 
 command.add("skip", function(msg, args)
-	
+	if(connectedChannel ~= nil) then
+		if(getQueueSize(connectedChannel) > 0) then -- If there is even something playing
+			if(skippers[msg.author.id] ~= nil) then
+				
+			else
+				sendMessage(msg.channel.id, "[INFO] You already said you want to skip.")
+			end
+		end
+	else
+		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
+	end
 end)
 
 command.add("fskip", function(msg, args)

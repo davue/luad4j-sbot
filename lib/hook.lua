@@ -51,8 +51,6 @@ function hook.Remove(eventName, identifier)
 end
 
 function hook.Call(eventName, ...)
-	local args = {...}
-	
 	if(hookTable[eventName] == nil) then -- Add new event if not yet existing
 		hookTable[eventName] = {}
 		return true
