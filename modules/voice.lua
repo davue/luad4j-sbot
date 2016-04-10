@@ -18,7 +18,6 @@ end
 command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
-			deleteMessage(msg.channel.id, msg.id)
 			queueURL(connectedChannel, "http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: sc <url>")
@@ -26,12 +25,13 @@ command.add("sc", function(msg, args)
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
+	
+	deleteMessage(msg.channel.id, msg.id)
 end)
 
 command.add("addFile", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
-			deleteMessage(msg.channel.id, msg.id)
 			queueFile(connectedChannel, args[1])
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: add <soundpath>")
@@ -39,12 +39,13 @@ command.add("addFile", function(msg, args)
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
+	
+	deleteMessage(msg.channel.id, msg.id)
 end)
 
 command.add("addURL", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
-			deleteMessage(msg.channel.id, msg.id)
 			queueURL(connectedChannel, args[1])
 		else
 			sendMessage(msg.channel.id, "[INFO] Usage: add <soundURL>")
@@ -52,6 +53,8 @@ command.add("addURL", function(msg, args)
 	else
 		sendMessage(msg.channel.id, "[INFO] I am not in a voice channel.")
 	end
+	
+	deleteMessage(msg.channel.id, msg.id)
 end)
 
 command.add("stop", function(msg, args)
