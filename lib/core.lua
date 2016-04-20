@@ -10,9 +10,9 @@ local admins = {"S-Bot Dev"} -- All roles with admin access
 
 function core.isAdmin(msg)
 	for k, aRole in pairs(admins) do
-		local userRoles = getRoles(msg.author.id, msg.guild.id)
+		local userRoles = msg.getAuthor().getRolesForGuildID(msg.getGuild().getID())
 		for k, uRole in pairs(userRoles) do
-			if(aRole == uRole.name) then
+			if(aRole == uRole.getName()) then
 				return true
 			end
 		end

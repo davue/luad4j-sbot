@@ -32,10 +32,12 @@ function command.getTable()
 end
 
 local function handleMessage(msg)
-	if(msg.text ~= nil) then -- If there is actually text
-		if(string.sub(msg.text,1,1) == "!") then -- If it starts like a command
+	text = msg.getContent()
+	
+	if(text ~= nil) then -- If there is actually text
+		if(string.sub(text,1,1) == "!") then -- If it starts like a command
 			local args = {}
-			for subStr in string.gmatch(string.sub(msg.text,2),"%S+") do table.insert(args, subStr) end -- Split message by spaces and remove command sign
+			for subStr in string.gmatch(string.sub(text,2),"%S+") do table.insert(args, subStr) end -- Split message by spaces and remove command sign
 			local command = args[1]
 			table.remove(args, 1) -- Remove first element of arguments because it's the command itself
 		
@@ -43,7 +45,7 @@ local function handleMessage(msg)
 				chatCommands[command](msg, args) -- Call command with msg and arguments
 				--deleteMessage(msg.channel.id, msg.id) -- Remove command message
 			else
-				sendMessage(msg.channel.id, "[INFO] Unknown command.")
+				msg.getChannel().sendMessage("[INFO] Unknown command.")
 			end
 		end
 	end

@@ -33,7 +33,7 @@ function depends.onLib(name)
 	if(not depends.libLoaded(name)) then
 		func, errorStr = loadfile(libPath..name..".lua") 
 		if(func == nil) then
-			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading library ("..name.."):\n"..errorStr)
+			mainChannel.sendMessage("[DEPENDS][ERROR] Error loading library ("..name.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Library ("..name..") loaded!")
@@ -47,7 +47,7 @@ function depends.onModule(name)
 	if(not depends.moduleLoaded(name)) then
 		func, errorStr = loadfile(modulePath..name..".lua") 
 		if(func == nil) then
-			sendMessage(mainChannel, "[DEPENDS][ERROR] Error loading module ("..name.."):\n"..errorStr)
+			mainChannel.sendMessage("[DEPENDS][ERROR] Error loading module ("..name.."):\n"..errorStr)
 		else
 			func()
 			print("[LUA] Module ("..name..") loaded!")

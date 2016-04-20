@@ -23,23 +23,23 @@ about
 ]]
 
 command.add("ping", function(msg, args)
-	sendMessage(msg.channel.id, "Pong!")
+	msg.getChannel().sendMessage("Pong!")
 end)
 
 command.add("lua", function(msg, args)
 	if(core.isAdmin(msg)) then
 		if(#args > 0) then
-			local luaCommand = string.sub(msg.text, 6)
+			local luaCommand = string.sub(msg.getContent(), 6)
 			if(luaCommand ~= "") then
 				func, errorStr = load(luaCommand)
 				if (func ~= nil) then
 					func()
 				else
-					sendMessage(msg.channel.id, "[ERROR] An error occured while running the script:\n"..errorStr)
+					msg.getChannel().sendMessage("[ERROR] An error occured while running the script:\n"..errorStr)
 				end
 			end
 		else
-			sendMessage(msg.channel.id, "[INFO] Usage: lua <luascript>")
+			msg.getChannel().sendMessage("[INFO] Usage: lua <luascript>")
 		end
 	end
 end)
@@ -47,14 +47,14 @@ end)
 command.add("sh", function(msg, args)
 	if(core.isAdmin(msg)) then
 		if(#args > 0) then
-			local output = tostring(os.capture(string.sub(msg.text,5), true))
+			local output = tostring(os.capture(string.sub(msg.getContent(),5), true))
 			if(output ~= "") then
-				sendMessage(msg.channel.id, output)
+				msg.getChannel().sendMessage(output)
 			else
-				sendMessage(msg.channel.id, "[Empty]")
+				msg.getChannel().sendMessage("[Empty]")
 			end
 		else
-			sendMessage(msg.channel.id, "[INFO] Usage: sh <shellcmd>")
+			msg.getChannel().sendMessage("[INFO] Usage: sh <shellcmd>")
 		end
 	end
 end)
@@ -62,9 +62,7 @@ end)
 command.add("help", function(msg, args)
 	local cmds = ""
 	for key, value in pairs(chatCommands) do
-		if key ~= "getuser" then
-			cmds = cmds..key.."\n"
-		end
+		cmds = cmds..key.."\n"
 	end
-	sendMessage(msg.channel.id, "[INFO] Available commands:\n"..cmds)
+	msg.getChannel().sendMessage("[INFO] Available commands:\n"..cmds)
 end)

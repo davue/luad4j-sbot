@@ -1,7 +1,7 @@
 luaPath = "lua/"
 libPath = luaPath .. "lib/"
 modulePath = luaPath .. "modules/"
-mainChannel = "165560868426219520" -- #stammbot-dev-channel @ Stammgruppe Afterbirth
+mainChannel = discordClient.getChannelByID("165560868426219520") -- stammbot-dev-channel @ Stammgruppe Afterbirth
 
 ------------------------
 ---- Initialization ----
@@ -9,7 +9,7 @@ mainChannel = "165560868426219520" -- #stammbot-dev-channel @ Stammgruppe Afterb
 function loadDependencyManager()
 	local func, errorStr = loadfile(libPath.."depends.lua")
 	if(func == nil) then
-		sendMessage(mainChannel, "[INIT][ERROR] An error occured while loading dependency manager:\n"..errorStr)
+		mainChannel.sendMessage("[INIT][ERROR] An error occured while loading dependency manager:\n"..errorStr)
 	else
 		func()
 		print("[LUA] Dependency manager loaded!")
@@ -35,7 +35,7 @@ loadDependencyManager() -- Load dependency manager
 loadLibs()				-- Load essential libraries
 loadModules()			-- Load additional modules
 
---sendMessage(mainChannel, "[INFO] Initialized!")
+mainChannel.sendMessage("[INFO] Initialized!")
 
 -----------------------------
 ---- Vital Chat Commands ----
@@ -48,10 +48,10 @@ command.add("update", function(msg, args)
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)														-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
-			sendMessage(mainChannel, "[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
-			sendMessage(mainChannel, "[Update] Please reload the bot to apply the changes.")		-- Safety delay to give the update process some time (needs admin credentials)
+			mainChannel.sendMessage("[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
+			mainChannel.sendMessage("[Update] Please reload the bot to apply the changes.")		-- Safety delay to give the update process some time (needs admin credentials)
 		else
-			sendMessage(mainChannel, "[Update] Already up-to-date.")
+			mainChannel.sendMessage("[Update] Already up-to-date.")
 		end
 	end
 end)
@@ -60,7 +60,7 @@ command.add("reload", function(msg, args)
 	if(core.isAdmin(msg)) then
 		func, errorStr = loadfile(luaPath .."main.lua")
 		if(func == nil) then
-			sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..errorStr)
+			mainChannel.sendMessage("[ERROR] An error occured while running the script:\n"..errorStr)
 		else
 			func()
 		end
@@ -75,9 +75,9 @@ function onMessageReceived(msg)
 end
 
 function onLuaError(reason)
-	sendMessage(mainChannel, "[ERROR] An error occured while running the script:\n"..reason)
+	mainChannel.sendMessage("[ERROR] An error occured while running the script:\n"..reason)
 end
 
 function onPortData(data)
-	sendMessage(mainChannel, data)
+	mainChannel.sendMessage(data)
 end
