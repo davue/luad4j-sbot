@@ -13,7 +13,7 @@ function vote.start(identifier, callback, ...)
 		table.remove(args, 1)
 		
 		for k, v in pairs(args) do
-			voteTable.answers[]
+			--voteTable.answers[]
 		end
 		
 		votelist[identifier] = voteTable;	-- Insert vote into votelist
