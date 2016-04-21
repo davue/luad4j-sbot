@@ -71,7 +71,8 @@ end)
 ---- Events ----
 ----------------
 function onDiscordDisconnected(reason)
-	print("[LUA] API Disconnected: "..reason)	-- Print the reason why Discord4J lost connection
+	print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to re-login...")	-- Print the reason why Discord4J lost connection
+	discord.login()
 end
 
 function onMessageReceived(msg)
