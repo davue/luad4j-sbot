@@ -113,7 +113,7 @@ command.add("join", function(msg, args)
 								msg.getChannel().sendMessage("[INFO] You are already in this voice channel.")
 								break
 							else
-								msg.getChannel().sendMessage("[INFO] You are already in the voice channel: \"".. channel.name .."\".\n[INFO] You can only join one channel per server.")
+								msg.getChannel().sendMessage("[INFO] You are already in the voice channel: \"".. channel.getName() .."\".\n[INFO] You can only join one channel per server.")
 								break
 							end
 						end
