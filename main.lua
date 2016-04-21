@@ -1,7 +1,7 @@
 luaPath = "lua/"
 libPath = luaPath .. "lib/"
 modulePath = luaPath .. "modules/"
-mainChannel = discordClient.getChannelByID("165560868426219520") -- stammbot-dev-channel @ Stammgruppe Afterbirth
+mainChannel = discord.getChannelByID("165560868426219520") -- stammbot-dev-channel @ Stammgruppe Afterbirth
 
 ------------------------
 ---- Initialization ----

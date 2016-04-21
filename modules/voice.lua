@@ -90,14 +90,14 @@ end)
 command.add("join", function(msg, args)
 	if(core.isAdmin(msg)) then
 		voiceChannels = msg.getGuild().getVoiceChannels()
-		connectedChannels = discordClient.getConnectedVoiceChannels()
+		connectedChannels = discord.getConnectedVoiceChannels()
 		
 		if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
 			if(not voiceChannels[1].isConnected()) then
 				voiceChannels[1].join()
 				connectedChannel = voiceChannels[1]
 			else
-				msg.getChannel().sendMessage("[INFO] Bot is already in the voice channel.")
+				msg.getChannel().sendMessage("[INFO] I'm already in the voice channel.")
 			end
 		elseif(#voiceChannels >= 1) then -- if there are more than one voice channels
 			if(#args == 1) then -- when there are one or more arguments passed
@@ -110,10 +110,10 @@ command.add("join", function(msg, args)
 							channelExists = true
 							alreadyInChannel = true
 							if(channel.getName() == args[1]) then -- if it's the same channel you want to join
-								msg.getChannel().sendMessage("[INFO] You are already in this voice channel.")
+								msg.getChannel().sendMessage("[INFO] I'm already in this voice channel.")
 								break
 							else
-								msg.getChannel().sendMessage("[INFO] You are already in the voice channel: \"".. channel.getName() .."\".\n[INFO] You can only join one channel per server.")
+								msg.getChannel().sendMessage("[INFO] I'm already in the voice channel: \"".. channel.getName() .."\".\n[INFO] I can only join one channel per server.")
 								break
 							end
 						end
@@ -133,7 +133,7 @@ command.add("join", function(msg, args)
 					msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. args[1] .."\".\n")
 				end
 			elseif(#args >= 1) then
-				msg.getChannel().sendMessage("[INFO] You can only join one channel per server.")
+				msg.getChannel().sendMessage("[INFO] I can only join one channel per server.")
 			else -- need one arg to specify channel to leave
 				msg.getChannel().sendMessage("[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: joinVoice <channel>")
 			end
@@ -147,7 +147,7 @@ end)
 
 command.add("leave", function(msg, args)
 	if(core.isAdmin(msg)) then
-		local voiceChannels = discordClient.getConnectedVoiceChannels()
+		local voiceChannels = discord.getConnectedVoiceChannels()
 
 		for i, channel in pairs(voiceChannels) do
 			channel.leave()
@@ -185,7 +185,7 @@ command.add("fskip", function(msg, args)
 end)
 
 -- Leave all voice channels on reload
-local voiceChannels = discordClient.getConnectedVoiceChannels()
+local voiceChannels = discord.getConnectedVoiceChannels()
 
 for i, channel in pairs(voiceChannels) do
 	channel.leave()
