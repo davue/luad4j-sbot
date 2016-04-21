@@ -48,6 +48,8 @@ command.add("stop", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("volume", function(msg, args)
@@ -60,6 +62,8 @@ command.add("volume", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("pause", function(msg, args)
@@ -68,6 +72,8 @@ command.add("pause", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("resume", function(msg, args)
@@ -76,17 +82,20 @@ command.add("resume", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
+	
+	msg.delete()
 end)
 
+-- TODO: rewrite function to fully use the new wrapper
 command.add("join", function(msg, args)
 	if(core.isAdmin(msg)) then
-		voiceChannels = getVoiceChannels(msg.guild.id)
-		connectedChannels = getConnectedVoiceChannels()
+		voiceChannels = msg.getGuild().getVoiceChannels()
+		connectedChannels = discordClient.getConnectedVoiceChannels()
 		
 		if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
-			if(not isConnectedToVoice(voiceChannels[1].id)) then
-				joinVoiceChannel(voiceChannels[1].id)
-				connectedChannel = voiceChannels[1].id
+			if(not voiceChannels[1].isConnected()) then
+				voiceChannels[1].join()
+				connectedChannel = voiceChannels[1]
 			else
 				msg.getChannel().sendMessage("[INFO] Bot is already in the voice channel.")
 			end
@@ -97,10 +106,10 @@ command.add("join", function(msg, args)
 				
 				for k, channel in pairs(voiceChannels) do
 					for i, conChannel in pairs(connectedChannels) do
-						if(channel.id == conChannel.id) then -- if you are already in a channel of the same server
+						if(channel.getID() == conChannel.getID()) then -- if you are already in a channel of the same server
 							channelExists = true
 							alreadyInChannel = true
-							if(channel.name == args[1]) then -- if it's the same channel you want to join
+							if(channel.getName() == args[1]) then -- if it's the same channel you want to join
 								msg.getChannel().sendMessage("[INFO] You are already in this voice channel.")
 								break
 							else
@@ -110,10 +119,10 @@ command.add("join", function(msg, args)
 						end
 					end
 					
-					if(args[1] == channel.name and not alreadyInChannel) then -- if there is a channel with name <arg>
-						if(not isConnectedToVoice(voiceChannels[k].id)) then
-							joinVoiceChannel(voiceChannels[k].id)
-							connectedChannel = voiceChannels[1].id
+					if(args[1] == channel.getName() and not alreadyInChannel) then -- if there is a channel with name <arg>
+						if(not voiceChannels[k].isConnected()) then
+							voiceChannels[k].join()
+							connectedChannel = voiceChannels[1]
 							channelExists = true
 							break
 						end
@@ -121,7 +130,7 @@ command.add("join", function(msg, args)
 				end
 				
 				if(not channelExists) then
-					message = message .."[INFO] There is no channel called: \"".. arg[1] .."\".\n"
+					msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. arg[1] .."\".\n")
 				end
 			elseif(#args >= 1) then
 				msg.getChannel().sendMessage("[INFO] You can only join one channel per server.")
@@ -146,6 +155,8 @@ command.add("leave", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] Admin-only command.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("lssounds", function(msg, args)
@@ -169,6 +180,8 @@ command.add("fskip", function(msg, args)
 			msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 		end
 	end
+	
+	msg.delete()
 end)
 
 -- Leave all voice channels on reload
