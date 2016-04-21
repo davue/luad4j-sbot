@@ -70,6 +70,10 @@ end)
 ----------------
 ---- Events ----
 ----------------
+function onDiscordDisconnected(reason)
+	print("[LUA] API Disconnected: "..reason)	-- Print the reason why Discord4J lost connection
+end
+
 function onMessageReceived(msg)
 	hook.Call("onMessageReceived", msg)
 end
