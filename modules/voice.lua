@@ -130,7 +130,7 @@ command.add("join", function(msg, args)
 				end
 				
 				if(not channelExists) then
-					msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. arg[1] .."\".\n")
+					msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. args[1] .."\".\n")
 				end
 			elseif(#args >= 1) then
 				msg.getChannel().sendMessage("[INFO] You can only join one channel per server.")
