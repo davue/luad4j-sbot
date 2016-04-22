@@ -61,7 +61,7 @@ end)
 
 command.add("help", function(msg, args)
 	local cmds = ""
-	for key, value in pairs(chatCommands) do
+	for key, value in pairs(command.getTable()) do
 		cmds = cmds..key.."\n"
 	end
 	msg.getChannel().sendMessage("[INFO] Available commands:\n"..cmds)

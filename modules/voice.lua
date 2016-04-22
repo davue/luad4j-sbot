@@ -143,6 +143,8 @@ command.add("join", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO] Admin-only command.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("leave", function(msg, args)

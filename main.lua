@@ -32,8 +32,8 @@ end
 
 loadDependencyManager() -- Load dependency manager
 
-loadLibs()				-- Load essential libraries
-loadModules()			-- Load additional modules
+loadLibs()					-- Load essential libraries
+loadModules()				-- Load additional modules
 
 mainChannel.sendMessage("[INFO] Initialized!")
 
@@ -46,10 +46,10 @@ command.add("update", function(msg, args)
 		local text = os.capture("git -C ".. luaPath .." pull")
 		if (text ~= "Already up-to-date.") then
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
-			text = string.sub(text, endPos+15)														-- Remove version hashes from string
-			text = string.gsub(text, "([%+%-]+)%s", "%1\n")											-- Format file changes
+			text = string.sub(text, endPos+15)																		-- Remove version hashes from string
+			text = string.gsub(text, "([%+%-]+)%s", "%1\n")														-- Format file changes
 			mainChannel.sendMessage("[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
-			mainChannel.sendMessage("[Update] Please reload the bot to apply the changes.")		-- Safety delay to give the update process some time (needs admin credentials)
+			mainChannel.sendMessage("[Update] Please reload the bot to apply the changes.")			-- Safety delay to give the update process some time (needs admin credentials)
 		else
 			mainChannel.sendMessage("[Update] Already up-to-date.")
 		end
