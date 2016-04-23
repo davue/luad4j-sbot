@@ -70,12 +70,12 @@ end)
 ----------------
 ---- Events ----
 ----------------
-function onDiscordDisconnected(reason)
+function onDiscordDisconnectedEvent(reason)
 	print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to re-login...")	-- Print the reason why Discord4J lost connection
 	discord.login()
 end
 
-function onMessageReceived(msg)
+function onMessageReceivedEvent(msg)
 	hook.Call("onMessageReceived", msg)
 end
 
