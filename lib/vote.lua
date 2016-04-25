@@ -31,7 +31,7 @@ function vote.stop(identifier)
 	end
 end
 
-function vote.toggle(identifier, ansnum, user)
+function vote.toggle(identifier, ansnum, userID)
 	if(votelist[identifier] ~= nil) then
 		if(votelist[identifier].answers[ansnum].votes[userID] == nil) then
 			votelist[identifier].answers[ansnum].votes[userID] = 1
