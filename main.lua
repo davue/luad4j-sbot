@@ -81,7 +81,7 @@ local voteMessage
 function printVote(voteTable)
 	local message = "-- "..voteTable.question.." --\n"
 	for k, v in pairs(voteTable.answers) do
-		message = message.."["..k.."] "..v.name.."\n"
+		message = message.."["..k.."] "..v.name.." - "..#v.votes.." Votes \n"
 	end
 	
 	return message
