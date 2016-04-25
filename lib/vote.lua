@@ -12,6 +12,7 @@ function vote.start(identifier, ...)
 		table.remove(args, 1)
 		
 		for k, v in pairs(args) do
+			voteTable.answers[k] = {}
 			voteTable.answers[k].name = v
 			voteTable.answers[k].votes = {}
 		end
