@@ -16,8 +16,6 @@ function vote.start(identifier, ...)
 			voteTable.answers[k].votes = {}
 		end
 		
-		voteTable.message = channel.sendMessage(votelist[identifier].print(votelist[identifier]))
-		
 		votelist[identifier] = voteTable;	-- Insert vote into votelist
 	end
 end
