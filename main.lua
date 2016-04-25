@@ -1,6 +1,6 @@
-local luaPath = "lua/"
-local libPath = luaPath .. "lib/"
-local modulePath = luaPath .. "modules/"
+luaPath = "lua/"
+libPath = luaPath .. "lib/"
+modulePath = luaPath .. "modules/"
 local connected = false;
 
 mainChannel = discord.getChannelByID("165560868426219520") -- stammbot-dev-channel @ Stammgruppe Afterbirth
@@ -74,27 +74,6 @@ command.add("reload", function(msg, args)
 			func()
 		end
 	end
-end)
-
-local voteMessage
-
-function printVote(voteTable)
-	local message = "-- "..voteTable.question.." --\n"
-	for k, v in pairs(voteTable.answers) do
-		message = message.."["..k.."] "..v.name.." - "..#v.votes.." Votes \n"
-	end
-	
-	return message
-end
-
-command.add("testvote", function(msg, args) 
-	vote.start("test", "Test?", "Ja", "Nein")
-	voteMessage = msg.getChannel().sendMessage(printVote(vote.get("test")))
-end)
-
-command.add("vote", function(msg, args) 
-	vote.toggle("test", args[1], msg.getAuthor().getID())
-	voteMessage.edit(printVote(vote.get("test")))
 end)
 
 ----------------
