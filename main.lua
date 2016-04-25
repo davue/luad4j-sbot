@@ -1,6 +1,8 @@
-luaPath = "lua/"
-libPath = luaPath .. "lib/"
-modulePath = luaPath .. "modules/"
+local luaPath = "lua/"
+local libPath = luaPath .. "lib/"
+local modulePath = luaPath .. "modules/"
+local connected = false;
+
 mainChannel = discord.getChannelByID("165560868426219520") -- stammbot-dev-channel @ Stammgruppe Afterbirth
 
 ------------------------
@@ -27,6 +29,13 @@ function loadModules() -- Load Modules
 	local lsStr = os.capture("ls "..modulePath)
 	for file in string.gmatch(lsStr, "(%a+).lua") do 
 		depends.onModule(file)
+	end
+end
+
+function reconnect() -- Try to reconnect to Discord
+	if(not connected) then
+		discord.login()
+		setTimer(5000, reconnect) -- Retry in 5sec
 	end
 end
 
@@ -70,9 +79,14 @@ end)
 ----------------
 ---- Events ----
 ----------------
+function onReadyEvent()
+	connected = true;
+end
+
 function onDiscordDisconnectedEvent(reason)
-	print("[LUA] API Disconnected: "..reason)	-- Print the reason why Discord4J lost connection
-	--discord.login()
+	connected = false;
+	print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
+	setTimer(5000, reconnect)
 end
 
 function onMessageReceivedEvent(msg)
