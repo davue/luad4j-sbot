@@ -42,6 +42,6 @@ function vote.toggle(identifier, ansnum, userID)
 end
 
 function vote.startTimed(identifier, channel, printfunc, callback, delay, ...)
-	vote.start(identifier, channel, printfunc, callback, ...)	-- Start vote normally
-	setTimer(delay, vote.stop(identifier))								-- Stop it after <delay> ms
+	vote.start(identifier, ...)				-- Start vote normally
+	setTimer(delay, vote.stop(identifier))	-- Stop it after <delay> ms
 end
