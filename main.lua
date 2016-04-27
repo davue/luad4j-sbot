@@ -39,7 +39,7 @@ function reconnect() -- Try to reconnect to Discord
 	end
 end
 
-loadDependencyManager() -- Load dependency manager
+loadDependencyManager() 	-- Load dependency manager
 
 loadLibs()					-- Load essential libraries
 loadModules()				-- Load additional modules
@@ -93,6 +93,21 @@ function onMessageReceivedEvent(msg)
 	hook.Call("onMessageReceived", msg)
 end
 
+function onAudioUnqueuedEvent(event)
+	hook.Call("onAudioUnqueued", msg)
+end
+
+function onAudioStopEvent(event)
+	hook.Call("onAudioStop", msg)
+end
+
+function onUserVoiceChannelLeaveEvent(event)
+	hook.Call("onUserVoiceChannelLeave", event)
+end
+
+function onUserVoiceChannelJoinEvent(event)
+	hook.Call("onUserVoiceChannelJoin", event)
+end
 function onLuaError(reason)
 	mainChannel.sendMessage("[ERROR] An error occured while running the script:\n"..reason)
 end

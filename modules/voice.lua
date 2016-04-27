@@ -1,4 +1,4 @@
-local connectedChannel = nil -- #table 
+local connectedChannel = nil -- #table
 
 command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
@@ -122,7 +122,7 @@ command.add("join", function(msg, args)
 					if(args[1] == channel.getName() and not alreadyInChannel) then -- if there is a channel with name <arg>
 						if(not voiceChannels[k].isConnected()) then
 							voiceChannels[k].join()
-							connectedChannel = voiceChannels[1]
+							connectedChannel = voiceChannels[k]
 							channelExists = true
 							break
 						end
@@ -170,12 +170,8 @@ command.add("lssounds", function(msg, args)
 	msg.getChannel().sendMessage(soundlist)
 end)
 
-command.add("skip", function(msg, args)
-	
-end)
-
 command.add("fskip", function(msg, args)
-	if(core.isAdmin(msg)) then
+	if(msg == "override" or core.isAdmin(msg)) then
 		if(connectedChannel ~= nil) then
 			connectedChannel.getAudioChannel().skip()
 		else
@@ -186,8 +182,89 @@ command.add("fskip", function(msg, args)
 	msg.delete()
 end)
 
--- Leave all voice channels on reload
-local voiceChannels = discord.getConnectedVoiceChannels()
+----------------------------
+---- Skip functionality ----
+----------------------------
+depends.onLib("vote")	-- We need vote library functions
+
+local voteMessage = nil
+
+hook.Add("onUserVoiceChannelLeave", "updateVote", function()
+	if(vote.get("skip") ~= nil) then
+		voteMessage.edit(printVote(vote.get("skip")))
+	end
+end)
+
+hook.Add("onUserVoiceChannelJoin", "updateVote", function()
+	if(vote.get("skip") ~= nil) then
+		voteMessage.edit(printVote(vote.get("skip")))
+	end
+end)
+
+hook.Add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ended
+	if(vote.get("skip") ~= nil) then
+		vote.stop("skip")
+		voteMessage.delete()
+	end
+end)
+
+hook.Add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
+	if(vote.get("skip") ~= nil) then
+		vote.stop("skip")
+		voteMessage.delete()
+	end
+end)
+
+local function getConnectedUsers()	-- Function to get all users connected the voice channel
+	connectedUsers = {}
+	connectedUsers.count = 0
+	for k, v in pairs(connectedChannel.getGuild().getUsers()) do
+		voiceChannel = v.getVoiceChannel()
+		if(voiceChannel ~= nil and voiceChannel.getID() == connectedChannel.getID()) then -- If there is a voicechannel and it's the same as connected
+			table.insert(connectedUsers, v.getID())
+			connectedUsers.count = connectedUsers.count + 1
+		end
+	end
+	
+	return connectedUsers
+end
+
+local function printVote(voteTable)
+	local votesNeeded = math.ceil(getConnectedUsers().count/2)
+	local message = "--------- Skip? ---------\n"..voteTable.answers[1].votes.count.."/"..votesNeeded.." votes needed to skip"
+	return message
+end
+
+command.add("skip", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(connectedChannel.getAudioChannel().getQueueSize() > 0) then
+			if(vote.get("skip") == nil) then
+				vote.start("skip", "Skip?", "Yes")
+				vote.toggle("skip", 1, msg.getAuthor().getID())
+				voteMessage = msg.getChannel().sendMessage(printVote(vote.get("skip")))
+			else
+				vote.toggle("skip", 1, msg.getAuthor().getID())
+			end
+			
+			local votesNeeded = math.ceil(getConnectedUsers().count/2)
+			if(vote.get("skip").answers[1].votes.count == votesNeeded) then
+				voteMessage.edit("Vote passed, skipping...")
+				connectedChannel.getAudioChannel().skip()
+			else
+				voteMessage.edit(printVote(vote.get("skip")))
+			end
+		else
+			msg.getChannel().sendMessage("[INFO] There is no queued audio.")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+end)
+
+--------------
+---- Init ----
+--------------
+local voiceChannels = discord.getConnectedVoiceChannels()	-- Leave all voice channels on init
 
 for i, channel in pairs(voiceChannels) do
 	channel.leave()
