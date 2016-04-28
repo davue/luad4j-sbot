@@ -48,7 +48,7 @@ end
 local function win(player)
 	status = players[player].name.." wins! Resetting game..."
 	players[player].score = players[player].score + 1
-	printGame()
+	printGame(nil)
 	
 	setTimer(4000, function() 
 		fields = {}
@@ -58,7 +58,7 @@ local function win(player)
 	
 		turn = 0
 		
-		printGame()
+		printGame(nil)
 	end)
 end
 
