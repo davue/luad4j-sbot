@@ -70,13 +70,14 @@ command.add("ttt", function(msg, args)
 						info.delete()
 					end)
 					
+					msg.delete()
 					return
 				end
 			end
 			
-			if(players[1].id == "none" and players[2].id == "none") then -- If there is space for another player
+			if(players[1].id == "none" or players[2].id == "none") then -- If there is space for another player
 				if(players[1].id == "none") then -- Start new game
-					gameMessage = nil -- Create new game message
+					--gameMessage = nil -- Create new game message
 					reset() -- Reset game
 					players[1].name = msg.getAuthor().getName()
 					players[1].id = msg.getAuthor().getID()
@@ -126,6 +127,7 @@ command.add("ttt", function(msg, args)
 						printGame(msg.getChannel()) -- Update message
 					end
 					
+					msg.delete()
 					return
 				end
 			end
