@@ -45,6 +45,102 @@ local function toggleTurn()
 	status = "Waiting for turn..."
 end
 
+local function win(player)
+	status = players[player].name.." wins! Resetting game..."
+	players[player].score = players[player].score + 1
+	printGame()
+	
+	setTimer(4000, function() 
+		fields = {}
+		for i=1, 9 do
+			fields[i] = " "
+		end
+	
+		turn = 0
+		
+		printGame()
+	end)
+end
+
+local function checkForWinner()
+	local filledFields = 0
+	for k, v in pairs(fields) do
+		if(v ~= " ") then
+			filledFields = filledFields + 1
+		end
+	end
+	
+	-- Check if player 1 won
+	if(fields[1] == "X" and fields[2] == "X" and fields[3] == "X") then
+		win(1)
+		return
+	elseif(fields[4] == "X" and fields[5] == "X" and fields[6] == "X") then
+		win(1)
+		return
+	elseif(fields[7] == "X" and fields[8] == "X" and fields[9] == "X") then
+		win(1)
+		return
+	elseif(fields[1] == "X" and fields[4] == "X" and fields[7] == "X") then
+		win(1)
+		return
+	elseif(fields[2] == "X" and fields[5] == "X" and fields[8] == "X") then
+		win(1)
+		return
+	elseif(fields[3] == "X" and fields[6] == "X" and fields[9] == "X") then
+		win(1)
+		return
+	elseif(fields[1] == "X" and fields[5] == "X" and fields[9] == "X") then
+		win(1)
+		return
+	elseif(fields[7] == "X" and fields[5] == "X" and fields[3] == "X") then
+		win(1)
+		return
+	end
+	
+	-- Check if player 2 won
+	if(fields[1] == "O" and fields[2] == "O" and fields[3] == "O") then
+		win(2)
+		return
+	elseif(fields[4] == "O" and fields[5] == "O" and fields[6] == "O") then
+		win(2)
+		return
+	elseif(fields[7] == "O" and fields[8] == "O" and fields[9] == "O") then
+		win(2)
+		return
+	elseif(fields[1] == "O" and fields[4] == "O" and fields[7] == "O") then
+		win(2)
+		return
+	elseif(fields[2] == "O" and fields[5] == "O" and fields[8] == "O") then
+		win(2)
+		return
+	elseif(fields[3] == "O" and fields[6] == "O" and fields[9] == "O") then
+		win(2)
+		return
+	elseif(fields[1] == "O" and fields[5] == "O" and fields[9] == "O") then
+		win(2)
+		return
+	elseif(fields[7] == "O" and fields[5] == "O" and fields[3] == "O") then
+		win(2)
+		return
+	end
+	
+	if(filledFields >= 9) then -- If there are no empty fields and there is no winner -> draw
+		status = "Draw. Resetting game..."
+		printGame()
+		
+		setTimer(4000, function() 
+			fields = {}
+			for i=1, 9 do
+				fields[i] = " "
+			end
+		
+			turn = 0
+			
+			printGame()
+		end)
+	end
+end
+
 local function printGame(channel) -- Prints the game
 	local message = "```    1   2   3\n"
 	message = message.."  ┌───┬───┬───┐\n"
@@ -159,7 +255,7 @@ command.add("ttt", function(msg, args)
 								fields[fieldmap[args[1]]] = "O"
 							end
 							
-							-- TODO: Check for winner
+							checkForWinner()
 							
 							toggleTurn()
 							printGame(msg.getChannel()) -- Update message
