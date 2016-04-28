@@ -7,9 +7,11 @@ local gameMessage = nil -- Message object of game
 
 local function reset() -- Resets the game
 	players = {}
+	players[1] = {}
 	players[1].name = "none"
 	players[1].id = "none"
 	players[1].score = 0
+	players[2] = {}
 	players[2].name = "none"
 	players[2].id = "none"
 	players[2].score = 0
@@ -46,7 +48,7 @@ local function printGame(channel) -- Prints the game
 	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
 	message = message.."  ├───┼───┼───┤	"..players[1].name..": "..players[1].score.."\n"
 	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..": "..players[2].score.."\n"
-	message = message.."  └───┴───┴───┘"
+	message = message.."  └───┴───┴───┘```"
 	
 	if(gameMessage == nil) then
 		gameMessage = channel.sendMessage(message)
