@@ -47,7 +47,7 @@ local function printGame(channel) -- Prints the game
 	local message = "```    1   2   3\n"
 	message = message.."  ┌───┬───┬───┐\n"
 	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
-	message = message.."  ├───┼───┼───┤ Status: "..status.."\n"
+	message = message.."  ├───┼───┼───┤ Status:	"..status.."\n"
 	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
 	message = message.."  ├───┼───┼───┤	"..players[1].name..": "..players[1].score.."\n"
 	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..": "..players[2].score.."\n"
@@ -149,6 +149,8 @@ command.add("ttt", function(msg, args)
 	else
 		msg.getChannel().sendMessage("[INFO][TTT] Usage:\nttt join: Joins the game.\nttt leave: Leaves the game.\nttt <field>: Sets your sign to the given field.")
 	end
+	
+	msg.delete()
 end)
 
 --[[
