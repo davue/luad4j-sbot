@@ -185,8 +185,6 @@ end)
 ----------------------------
 ---- Skip functionality ----
 ----------------------------
-depends.onLib("vote")	-- We need vote library functions
-
 local voteMessage = nil
 
 hook.Add("onUserVoiceChannelLeave", "updateVote", function()
