@@ -4,6 +4,7 @@ local turn = 0	-- Which player plays next
 local status = "" -- Status message
 
 local gameMessage = nil -- Message object of game
+local gameFinished = false
 
 local fieldmap = {A1=1, A2=2, A3=3, B1=4, B2=5, B3=6, C1=7, C2=8, C3=9} -- A mapping of field strings to indeces
 
@@ -45,10 +46,38 @@ local function toggleTurn()
 	status = "Waiting for turn..."
 end
 
+local function printGame() -- Prints the game
+	local p1Spaces = ""
+	local p2Spaces = ""
+	local diff = string.len(players[1].name) - string.len(players[2].name)
+	if(diff > 0) then
+		for i=1, diff do
+			p2Spaces = p2Spaces.." "
+		end
+	elseif(diff < 0) then
+		for i=1, -diff do
+			p1Spaces = p1Spaces.." "
+		end
+	end
+
+	local message = "```    1   2   3\n"
+	message = message.."  ┌───┬───┬───┐\n"
+	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
+	message = message.."  ├───┼───┼───┤ Status:  "..status.."\n"
+	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
+	message = message.."  ├───┼───┼───┤	"..players[1].name..":	"..p1Spaces..players[1].score.."\n"
+	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..":	"..p2Spaces..players[2].score.."\n"
+	message = message.."  └───┴───┴───┘```"
+	
+	gameMessage.edit(message)
+end
+
 local function win(player)
+	print("Player "..player.." wins!")
 	status = players[player].name.." wins! Resetting game..."
 	players[player].score = players[player].score + 1
 	printGame()
+	gameFinished = true
 	
 	setTimer(4000, function() 
 		fields = {}
@@ -57,8 +86,11 @@ local function win(player)
 		end
 	
 		turn = 0
+		toggleTurn()
 		
 		printGame()
+		
+		gameFinished = false
 	end)
 end
 
@@ -127,6 +159,7 @@ local function checkForWinner()
 	if(filledFields >= 9) then -- If there are no empty fields and there is no winner -> draw
 		status = "Draw. Resetting game..."
 		printGame()
+		gameFinished = true
 		
 		setTimer(4000, function() 
 			fields = {}
@@ -135,8 +168,10 @@ local function checkForWinner()
 			end
 		
 			turn = 0
+			toggleTurn()
 			
 			printGame()
+			gameFinished = false
 		end)
 	end
 end
@@ -152,19 +187,6 @@ local function createGame(channel)
 	message = message.."  └───┴───┴───┘```"
 	
 	gameMessage = channel.sendMessage(message)
-end
-
-local function printGame() -- Prints the game
-	local message = "```    1   2   3\n"
-	message = message.."  ┌───┬───┬───┐\n"
-	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
-	message = message.."  ├───┼───┼───┤ Status:  "..status.."\n"
-	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
-	message = message.."  ├───┼───┼───┤	"..players[1].name..":	"..players[1].score.."\n"
-	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..":	"..players[2].score.."\n"
-	message = message.."  └───┴───┴───┘```"
-	
-	gameMessage.edit(message)
 end
 
 command.add("ttt", function(msg, args)
@@ -227,6 +249,11 @@ command.add("ttt", function(msg, args)
 						players[1].score = 0
 						players[2].score = 0
 						
+						fields = {}
+						for i=1, 9 do
+							fields[i] = " "
+						end
+						
 						turn = 0
 						
 						status = "Waiting for second player..."
@@ -247,48 +274,57 @@ command.add("ttt", function(msg, args)
 				info.delete()
 			end)
 		elseif(string.find(args[1], "%a%d") ~= nil) then -- If a player wants to make a turn
-			if(players[1].id ~= "none" and players[2].id ~= "none") then -- If there are 2 players
-				local playernum
-				for k, v in pairs(players) do	-- Determine player number
-					if(msg.getAuthor().getID() == v.id) then
-						playernum = k
-						break
+			if(not gameFinished) then
+				if(players[1].id ~= "none" and players[2].id ~= "none") then -- If there are 2 players
+					local playernum
+					for k, v in pairs(players) do	-- Determine player number
+						if(msg.getAuthor().getID() == v.id) then
+							playernum = k
+							break
+						end
 					end
-				end
-				
-				if(turn == playernum) then -- If it's the players turn
-					if(fields[fieldmap[args[1]]] ~= nil) then
-						if(fields[fieldmap[args[1]]] == " ") then
-							if(playernum == 1) then
-								fields[fieldmap[args[1]]] = "X"
+					
+					if(turn == playernum) then -- If it's the players turn
+						if(fields[fieldmap[args[1]]] ~= nil) then
+							if(fields[fieldmap[args[1]]] == " ") then
+								if(playernum == 1) then
+									fields[fieldmap[args[1]]] = "X"
+								else
+									fields[fieldmap[args[1]]] = "O"
+								end
+								
+								checkForWinner()
+								
+								if(not gameFinished) then
+									toggleTurn()
+									printGame() -- Update message
+								end
 							else
-								fields[fieldmap[args[1]]] = "O"
+								local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
+								setTimer(5000, function() -- Delete message after 5 seconds
+									info.delete()
+								end)
 							end
-							
-							checkForWinner()
-							
-							toggleTurn()
-							printGame() -- Update message
 						else
-							local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
+							local info = msg.getChannel().sendMessage("[INFO][TTT] Unknown field: "..args[1])
 							setTimer(5000, function() -- Delete message after 5 seconds
 								info.delete()
 							end)
 						end
 					else
-						local info = msg.getChannel().sendMessage("[INFO][TTT] Unknown field: "..args[1])
+						local info = msg.getChannel().sendMessage("[INFO][TTT] It's not your turn.")
 						setTimer(5000, function() -- Delete message after 5 seconds
 							info.delete()
 						end)
 					end
 				else
-					local info = msg.getChannel().sendMessage("[INFO][TTT] It's not your turn.")
+					local info = msg.getChannel().sendMessage("[INFO][TTT] 2 Players are needed to play.")
 					setTimer(5000, function() -- Delete message after 5 seconds
 						info.delete()
 					end)
 				end
 			else
-				local info = msg.getChannel().sendMessage("[INFO][TTT] 2 Players are needed to play.")
+				local info = msg.getChannel().sendMessage("[INFO][TTT] Game recently finished. Please wait for reset.")
 				setTimer(5000, function() -- Delete message after 5 seconds
 					info.delete()
 				end)
