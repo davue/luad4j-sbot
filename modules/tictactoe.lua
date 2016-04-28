@@ -56,90 +56,93 @@ local function printGame(channel) -- Prints the game
 end
 
 command.add("ttt", function(msg, args)
-	if(args[1] == "join") then -- If a player wants to join
-		
-		for k, v in pairs(players) do	-- Check if user is already playing
-			if(msg.getAuthor().getID() == v.id) then
-				local info = msg.getChannel().sendMessage("[INFO][TTT] You are already playing.")
-				setTimer(5000, function() -- Delete message after 5 seconds
-					info.delete()
-				end)
-				
-				return
+	if(#args > 0) then
+		if(args[1] == "join") then -- If a player wants to join
+			for k, v in pairs(players) do	-- Check if user is already playing
+				if(msg.getAuthor().getID() == v.id) then
+					local info = msg.getChannel().sendMessage("[INFO][TTT] You are already playing.")
+					setTimer(5000, function() -- Delete message after 5 seconds
+						info.delete()
+					end)
+					
+					return
+				end
 			end
-		end
-		
-		if(#players < 2) then -- If there is space for another player
-			if(#players == 0) then -- Start new game
-				gameMessage = nil -- Create new game message
-				reset() -- Reset game
-				players[1].name = msg.getAuthor().getName()
-				players[1].id = msg.getAuthor().getID()
-				status = "Waiting for second player..."
-				printGame(msg.getChannel()) 
-			elseif(#players == 1) then
-				if(players[1] == nil) then
+			
+			if(#players < 2) then -- If there is space for another player
+				if(#players == 0) then -- Start new game
+					gameMessage = nil -- Create new game message
+					reset() -- Reset game
 					players[1].name = msg.getAuthor().getName()
 					players[1].id = msg.getAuthor().getID()
-				else
-					players[2].name = msg.getAuthor().getName()
-					players[2].id = msg.getAuthor().getID()
-				end
-				
-				-- Reset score
-				players[1].score = 0
-				players[2].score = 0
-				
-				-- Determine first turn
-				toggleTurn()
-			end
-		else
-			local info = msg.getChannel().sendMessage("[INFO][TTT] There are already 2 players.")
-			setTimer(5000, function() -- Delete message after 5 seconds
-				info.delete()
-			end)
-		end
-	elseif(args[1] == "leave") then -- If a player wants to leave
-		for k, v in pairs(players) do	-- Check if player is playing
-			if(msg.getAuthor().getID() == v.id) then
-				if(#players == 2) then
-					if(k == 1) then -- If player 1 wants to leave
-						-- Move player 2 to player 1
-						tempplayer = deepcopy(players[2])
-						players[1] = tempplayer
+					status = "Waiting for second player..."
+					printGame(msg.getChannel()) 
+				elseif(#players == 1) then
+					if(players[1] == nil) then
+						players[1].name = msg.getAuthor().getName()
+						players[1].id = msg.getAuthor().getID()
+					else
+						players[2].name = msg.getAuthor().getName()
+						players[2].id = msg.getAuthor().getID()
 					end
-					
-					-- Reset player 2
-					players[2].name = "none"
-					players[2].id = "none"
 					
 					-- Reset score
 					players[1].score = 0
 					players[2].score = 0
 					
-					status = "Waiting for second player..."
-				elseif(#players == 1) then
-					reset()
+					-- Determine first turn
+					toggleTurn()
 				end
-				
-				return
+			else
+				local info = msg.getChannel().sendMessage("[INFO][TTT] There are already 2 players.")
+				setTimer(5000, function() -- Delete message after 5 seconds
+					info.delete()
+				end)
 			end
+		elseif(args[1] == "leave") then -- If a player wants to leave
+			for k, v in pairs(players) do	-- Check if player is playing
+				if(msg.getAuthor().getID() == v.id) then
+					if(#players == 2) then
+						if(k == 1) then -- If player 1 wants to leave
+							-- Move player 2 to player 1
+							tempplayer = deepcopy(players[2])
+							players[1] = tempplayer
+						end
+						
+						-- Reset player 2
+						players[2].name = "none"
+						players[2].id = "none"
+						
+						-- Reset score
+						players[1].score = 0
+						players[2].score = 0
+						
+						status = "Waiting for second player..."
+					elseif(#players == 1) then
+						reset()
+					end
+					
+					return
+				end
+			end
+			
+			local info = msg.getChannel().sendMessage("[INFO][TTT] You can't leave if you're not playing.")
+			setTimer(5000, function() -- Delete message after 5 seconds
+				info.delete()
+			end)
+		elseif(string.find(args[1], "%a%d") ~= nil) then -- If a player wants to make a turn
+			-- Get field
+			local char, num = string.match(args[1], "(%a)(%d)")
+			
+			-- TODO: implement game logic
+		else
+			local info = msg.getChannel().sendMessage("[WARN][TTT] Invalid parameters.")
+			setTimer(5000, function() -- Delete message after 5 seconds
+				info.delete()
+			end)
 		end
-		
-		local info = msg.getChannel().sendMessage("[INFO][TTT] You can't leave if you're not playing.")
-		setTimer(5000, function() -- Delete message after 5 seconds
-			info.delete()
-		end)
-	elseif(string.find(args[1], "%a%d") ~= nil) then -- If a player wants to make a turn
-		-- Get field
-		local char, num = string.match(args[1], "(%a)(%d)")
-		
-		-- TODO: implement game logic
 	else
-		local info = msg.getChannel().sendMessage("[WARN][TTT] Invalid parameters.")
-		setTimer(5000, function() -- Delete message after 5 seconds
-			info.delete()
-		end)
+		msg.getChannel().sendMessage("[INFO][TTT] Usage:\nttt join: Joins the game.\nttt leave: Leaves the game.\nttt <field>: Sets your sign to the given field.")
 	end
 end)
 
