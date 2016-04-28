@@ -141,7 +141,7 @@ local function checkForWinner()
 	end
 end
 
-local function createGame()
+local function createGame(channel)
 	local message = "```    1   2   3\n"
 	message = message.."  ┌───┬───┬───┐\n"
 	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
