@@ -5,6 +5,8 @@ local status = "" -- Status message
 
 local gameMessage = nil -- Message object of game
 
+local fieldmap = {A1=1, A2=2, A3=3, B1=4, B2=5, B3=6, C1=7, C2=8, C3=9} -- A mapping of field strings to indeces
+
 local function reset() -- Resets the game
 	players = {}
 	players[1] = {}
@@ -49,8 +51,8 @@ local function printGame(channel) -- Prints the game
 	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
 	message = message.."  ├───┼───┼───┤ Status:  "..status.."\n"
 	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
-	message = message.."  ├───┼───┼───┤	"..players[1].name..": "..players[1].score.."\n"
-	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..": "..players[2].score.."\n"
+	message = message.."  ├───┼───┼───┤	"..players[1].name..":	"..players[1].score.."\n"
+	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..":	"..players[2].score.."\n"
 	message = message.."  └───┴───┴───┘```"
 	
 	if(gameMessage == nil) then
@@ -119,6 +121,8 @@ command.add("ttt", function(msg, args)
 						players[1].score = 0
 						players[2].score = 0
 						
+						turn = 0
+						
 						status = "Waiting for second player..."
 						
 						printGame(msg.getChannel()) -- Update message
@@ -137,10 +141,44 @@ command.add("ttt", function(msg, args)
 				info.delete()
 			end)
 		elseif(string.find(args[1], "%a%d") ~= nil) then -- If a player wants to make a turn
-			-- Get field
-			local char, num = string.match(args[1], "(%a)(%d)")
+			local playernum
+			for k, v in pairs(players) do	-- Determine player number
+				if(msg.getAuthor().getID() == v.id) then
+					playernum = k
+					break
+				end
+			end
 			
-			-- TODO: implement game logic
+			if(turn == playernum) then -- If it's the players turn
+				if(fields[fieldmap[args[1]]] ~= nil) then
+					if(fields[fieldmap[args[1]]] ~= " ") then
+						if(playernum == 1) then
+							fields[fieldmap[args[1]]] = "X"
+						else
+							fields[fieldmap[args[1]]] = "O"
+						end
+						
+						-- TODO: Check for winner
+						
+						printGame(msg.getChannel()) -- Update message
+					else
+						local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
+						setTimer(5000, function() -- Delete message after 5 seconds
+							info.delete()
+						end)
+					end
+				else
+					local info = msg.getChannel().sendMessage("[INFO][TTT] Unknown field: "..args[1])
+					setTimer(5000, function() -- Delete message after 5 seconds
+						info.delete()
+					end)
+				end
+			else
+				local info = msg.getChannel().sendMessage("[INFO][TTT] It's not your turn.")
+				setTimer(5000, function() -- Delete message after 5 seconds
+					info.delete()
+				end)
+			end
 		else
 			local info = msg.getChannel().sendMessage("[WARN][TTT] Invalid parameters.")
 			setTimer(5000, function() -- Delete message after 5 seconds
