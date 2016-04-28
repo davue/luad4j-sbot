@@ -152,7 +152,7 @@ local function createGame()
 	message = message.."  └───┴───┴───┘```"
 	
 	gameMessage = channel.sendMessage(message)
-end)
+end
 
 local function printGame() -- Prints the game
 	local message = "```    1   2   3\n"
@@ -202,7 +202,7 @@ command.add("ttt", function(msg, args)
 					toggleTurn()
 				end
 				
-				printGame(msg.getChannel()) -- Update message
+				printGame() -- Update message
 			else
 				local info = msg.getChannel().sendMessage("[INFO][TTT] There are already 2 players.")
 				setTimer(5000, function() -- Delete message after 5 seconds
@@ -231,10 +231,10 @@ command.add("ttt", function(msg, args)
 						
 						status = "Waiting for second player..."
 						
-						printGame(msg.getChannel()) -- Update message
+						printGame() -- Update message
 					elseif(players[1].id ~= "none") then -- If there is only one player left
 						reset()
-						printGame(msg.getChannel()) -- Update message
+						printGame() -- Update message
 					end
 					
 					msg.delete()
@@ -268,7 +268,7 @@ command.add("ttt", function(msg, args)
 							checkForWinner()
 							
 							toggleTurn()
-							printGame(msg.getChannel()) -- Update message
+							printGame() -- Update message
 						else
 							local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
 							setTimer(5000, function() -- Delete message after 5 seconds
