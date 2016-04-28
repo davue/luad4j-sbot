@@ -141,40 +141,47 @@ command.add("ttt", function(msg, args)
 				info.delete()
 			end)
 		elseif(string.find(args[1], "%a%d") ~= nil) then -- If a player wants to make a turn
-			local playernum
-			for k, v in pairs(players) do	-- Determine player number
-				if(msg.getAuthor().getID() == v.id) then
-					playernum = k
-					break
+			if(players[1].id ~= "none" and players[2].id ~= "none") then -- If there are 2 players
+				local playernum
+				for k, v in pairs(players) do	-- Determine player number
+					if(msg.getAuthor().getID() == v.id) then
+						playernum = k
+						break
+					end
 				end
-			end
-			
-			if(turn == playernum) then -- If it's the players turn
-				if(fields[fieldmap[args[1]]] ~= nil) then
-					if(fields[fieldmap[args[1]]] ~= " ") then
-						if(playernum == 1) then
-							fields[fieldmap[args[1]]] = "X"
+				
+				if(turn == playernum) then -- If it's the players turn
+					if(fields[fieldmap[args[1]]] ~= nil) then
+						if(fields[fieldmap[args[1]]] == " ") then
+							if(playernum == 1) then
+								fields[fieldmap[args[1]]] = "X"
+							else
+								fields[fieldmap[args[1]]] = "O"
+							end
+							
+							-- TODO: Check for winner
+							
+							printGame(msg.getChannel()) -- Update message
 						else
-							fields[fieldmap[args[1]]] = "O"
+							local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
+							setTimer(5000, function() -- Delete message after 5 seconds
+								info.delete()
+							end)
 						end
-						
-						-- TODO: Check for winner
-						
-						printGame(msg.getChannel()) -- Update message
 					else
-						local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
+						local info = msg.getChannel().sendMessage("[INFO][TTT] Unknown field: "..args[1])
 						setTimer(5000, function() -- Delete message after 5 seconds
 							info.delete()
 						end)
 					end
 				else
-					local info = msg.getChannel().sendMessage("[INFO][TTT] Unknown field: "..args[1])
+					local info = msg.getChannel().sendMessage("[INFO][TTT] It's not your turn.")
 					setTimer(5000, function() -- Delete message after 5 seconds
 						info.delete()
 					end)
 				end
 			else
-				local info = msg.getChannel().sendMessage("[INFO][TTT] It's not your turn.")
+				local info = msg.getChannel().sendMessage("[INFO][TTT] 2 Players are needed to play.")
 				setTimer(5000, function() -- Delete message after 5 seconds
 					info.delete()
 				end)
