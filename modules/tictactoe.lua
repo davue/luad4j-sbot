@@ -16,6 +16,9 @@ local function reset() -- Resets the game
 	players[2].id = "none"
 	players[2].score = 0
 	
+	players[0] = {}
+	players[0].name = "none"
+	
 	fields = {}
 	for i=1, 9 do
 		fields[i] = " "
