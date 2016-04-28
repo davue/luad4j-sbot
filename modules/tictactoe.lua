@@ -152,6 +152,8 @@ command.add("ttt", function(msg, args)
 	msg.delete()
 end)
 
+reset() -- Reset game
+
 --[[
     1   2   3
   ┌───┬───┬───┐
