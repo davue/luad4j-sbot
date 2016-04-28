@@ -48,7 +48,7 @@ end
 local function win(player)
 	status = players[player].name.." wins! Resetting game..."
 	players[player].score = players[player].score + 1
-	printGame(nil)
+	printGame()
 	
 	setTimer(4000, function() 
 		fields = {}
@@ -58,7 +58,7 @@ local function win(player)
 	
 		turn = 0
 		
-		printGame(nil)
+		printGame()
 	end)
 end
 
@@ -141,7 +141,7 @@ local function checkForWinner()
 	end
 end
 
-local function printGame(channel) -- Prints the game
+local function createGame()
 	local message = "```    1   2   3\n"
 	message = message.."  ┌───┬───┬───┐\n"
 	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
@@ -151,11 +151,20 @@ local function printGame(channel) -- Prints the game
 	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..":	"..players[2].score.."\n"
 	message = message.."  └───┴───┴───┘```"
 	
-	if(gameMessage == nil) then
-		gameMessage = channel.sendMessage(message)
-	else
-		gameMessage.edit(message)
-	end
+	gameMessage = channel.sendMessage(message)
+end)
+
+local function printGame() -- Prints the game
+	local message = "```    1   2   3\n"
+	message = message.."  ┌───┬───┬───┐\n"
+	message = message.."A │ ".. fields[1] .." │ ".. fields[2] .." │ ".. fields[3] .." │ Turn:	"..players[turn].name.."\n"
+	message = message.."  ├───┼───┼───┤ Status:  "..status.."\n"
+	message = message.."B │ ".. fields[4] .." │ ".. fields[5] .." │ ".. fields[6] .." │\n"
+	message = message.."  ├───┼───┼───┤	"..players[1].name..":	"..players[1].score.."\n"
+	message = message.."C │ ".. fields[7] .." │ ".. fields[8] .." │ ".. fields[9] .." │	"..players[2].name..":	"..players[2].score.."\n"
+	message = message.."  └───┴───┴───┘```"
+	
+	gameMessage.edit(message)
 end
 
 command.add("ttt", function(msg, args)
@@ -175,11 +184,12 @@ command.add("ttt", function(msg, args)
 			
 			if(players[1].id == "none" or players[2].id == "none") then -- If there is space for another player
 				if(players[1].id == "none") then -- Start new game
-					--gameMessage = nil -- Create new game message
 					reset() -- Reset game
 					players[1].name = msg.getAuthor().getName()
 					players[1].id = msg.getAuthor().getID()
 					status = "Waiting for second player..." 
+					
+					createGame(msg.getChannel())
 				else
 					players[2].name = msg.getAuthor().getName()
 					players[2].id = msg.getAuthor().getID()
