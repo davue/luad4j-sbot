@@ -161,6 +161,7 @@ command.add("ttt", function(msg, args)
 							
 							-- TODO: Check for winner
 							
+							toggleTurn()
 							printGame(msg.getChannel()) -- Update message
 						else
 							local info = msg.getChannel().sendMessage("[INFO][TTT] "..args[1].." is already occupied.")
