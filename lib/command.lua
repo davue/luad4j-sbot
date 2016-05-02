@@ -3,16 +3,16 @@ depends.onLib("hook")
 --[[ Command Lib - Docs:
 The command library contains the chat command handling of the bot
 
-command.Add(string: command, function: cb_func)
+command.add(string: command, function: cb_func)
 	Adds a chat command which can be called via !<command>.
 	The callback function gets 2 arguments:
 		- msg: The message table of the message which triggered the command
 		- args[]: An array of arguments passed to the command
 	
-command.Remove(string: command)
+command.remove(string: command)
 	Removes a chat command. The chat command will be unknown after removing it.
 	
-command.Call(string: command, table: msg, table: args)
+command.call(string: command, table: msg, table: args)
 	Calls a chat command from inside lua.
 ]]
 
@@ -51,4 +51,4 @@ local function handleMessage(msg)
 	end
 end
 
-hook.Add("onMessageReceived", "messageHandler", handleMessage) -- Register message handler
+hook.add("onMessageReceived", "messageHandler", handleMessage) -- Register message handler

@@ -37,7 +37,7 @@ function loadModules() -- Load Modules
 end
 
 function reconnect() -- Try to reconnect to Discord
-	hook.Remove("autoreconnect") -- Prevents multiple reconnect attempts at the same time
+	hook.remove("autoreconnect") -- Prevents multiple reconnect attempts at the same time
 	
 	if(not isConnected) then
 		discord.login()
@@ -89,7 +89,7 @@ function onReadyEvent()
 	isConnected = true;
 	
 	-- Add autoreconnect hook
-	hook.Add("onDiscordDisconnected", "autoreconnect", function()
+	hook.add("onDiscordDisconnected", "autoreconnect", function()
 		isConnected = false;
 		print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
 		setTimer(5000, reconnect)
@@ -97,27 +97,27 @@ function onReadyEvent()
 end
 
 function onDiscordDisconnectedEvent(reason)
-	hook.Call("onDiscordDisconnected", reason)
+	hook.call("onDiscordDisconnected", reason)
 end
 
 function onMessageReceivedEvent(msg)
-	hook.Call("onMessageReceived", msg)
+	hook.call("onMessageReceived", msg)
 end
 
 function onAudioUnqueuedEvent(event)
-	hook.Call("onAudioUnqueued", event)
+	hook.call("onAudioUnqueued", event)
 end
 
 function onAudioStopEvent(event)
-	hook.Call("onAudioStop", event)
+	hook.call("onAudioStop", event)
 end
 
 function onUserVoiceChannelLeaveEvent(event)
-	hook.Call("onUserVoiceChannelLeave", event)
+	hook.call("onUserVoiceChannelLeave", event)
 end
 
 function onUserVoiceChannelJoinEvent(event)
-	hook.Call("onUserVoiceChannelJoin", event)
+	hook.call("onUserVoiceChannelJoin", event)
 end
 function onLuaError(reason)
 	mainChannel.sendMessage("[ERROR] An error occured while running the script:\n"..reason)

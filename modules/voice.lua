@@ -187,26 +187,26 @@ end)
 ----------------------------
 local voteMessage = nil
 
-hook.Add("onUserVoiceChannelLeave", "updateVote", function()
+hook.add("onUserVoiceChannelLeave", "updateVote", function()
 	if(vote.get("skip") ~= nil) then
 		voteMessage.edit(printVote(vote.get("skip")))
 	end
 end)
 
-hook.Add("onUserVoiceChannelJoin", "updateVote", function()
+hook.add("onUserVoiceChannelJoin", "updateVote", function()
 	if(vote.get("skip") ~= nil) then
 		voteMessage.edit(printVote(vote.get("skip")))
 	end
 end)
 
-hook.Add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ended
+hook.add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ended
 	if(vote.get("skip") ~= nil) then
 		vote.stop("skip")
 		voteMessage.delete()
 	end
 end)
 
-hook.Add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
+hook.add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
 	if(vote.get("skip") ~= nil) then
 		vote.stop("skip")
 		voteMessage.delete()
