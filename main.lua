@@ -33,6 +33,8 @@ function loadModules() -- Load Modules
 end
 
 function reconnect() -- Try to reconnect to Discord
+	hook.Remove("autoreconnect") -- Prevents multiple reconnect attempts at the same time
+	
 	if(not connected) then
 		discord.login()
 		setTimer(5000, reconnect) -- Retry in 5sec
@@ -81,12 +83,17 @@ end)
 ----------------
 function onReadyEvent()
 	connected = true;
+	
+	-- Add autoreconnect hook
+	hook.Add("onDiscordDisconnected", "autoreconnect", function()
+		connected = false;
+		print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
+		setTimer(5000, reconnect)
+	end)
 end
 
 function onDiscordDisconnectedEvent(reason)
-	connected = false;
-	print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
-	setTimer(5000, reconnect)
+	hook.Call("onDiscordDisconnected", reason)
 end
 
 function onMessageReceivedEvent(msg)
@@ -94,11 +101,11 @@ function onMessageReceivedEvent(msg)
 end
 
 function onAudioUnqueuedEvent(event)
-	hook.Call("onAudioUnqueued", msg)
+	hook.Call("onAudioUnqueued", event)
 end
 
 function onAudioStopEvent(event)
-	hook.Call("onAudioStop", msg)
+	hook.Call("onAudioStop", event)
 end
 
 function onUserVoiceChannelLeaveEvent(event)
