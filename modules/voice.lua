@@ -1,5 +1,24 @@
 local connectedChannel = nil -- #table
 
+-- We Are One Network
+command.add("weareone", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(connectedChannel.getAudioChannel().getQueueSize() == 0) then
+			if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
+				connectedChannel.getAudioChannel().queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls")
+			else
+				msg.getChannel().sendMessage("[INFO] Usage: weareone (technobase/housetime/hardbase/trancebase/coretime/clubtime)")
+			end
+		else
+			msg.getChannel().sendMessage("[INFO] There is already something queued.")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+	
+	msg.delete()
+end)
+
 command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
@@ -19,7 +38,7 @@ command.add("addFile", function(msg, args)
 		if(#args == 1) then
 			connectedChannel.getAudioChannel().queueFile(args[1])
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: add <soundpath>")
+			msg.getChannel().sendMessage("[INFO] Usage: addFile <soundpath>")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
@@ -33,7 +52,7 @@ command.add("addURL", function(msg, args)
 		if(#args == 1) then
 			connectedChannel.getAudioChannel().queueURL(args[1])
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: add <soundURL>")
+			msg.getChannel().sendMessage("[INFO] Usage: addURL <soundURL>")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
@@ -86,7 +105,6 @@ command.add("resume", function(msg, args)
 	msg.delete()
 end)
 
--- TODO: rewrite function to fully use the new wrapper
 command.add("join", function(msg, args)
 	if(core.isAdmin(msg)) then
 		voiceChannels = msg.getGuild().getVoiceChannels()
@@ -135,7 +153,7 @@ command.add("join", function(msg, args)
 			elseif(#args >= 1) then
 				msg.getChannel().sendMessage("[INFO] I can only join one channel per server.")
 			else -- need one arg to specify channel to leave
-				msg.getChannel().sendMessage("[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: joinVoice <channel>")
+				msg.getChannel().sendMessage("[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: join <channel>")
 			end
 		else
 			msg.getChannel().sendMessage("[INFO] There are no voice channels on this server.")
