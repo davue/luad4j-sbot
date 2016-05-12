@@ -33,6 +33,20 @@ command.add("sc", function(msg, args)
 	msg.delete()
 end)
 
+command.add("yt", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			connectedChannel.getAudioChannel().queueFile(os.capture("curl -s http://46.105.132.36/getvideo.php?videoid=".. args[1] .."&format=best"))
+		else
+			msg.getChannel().sendMessage("[INFO] Usage: yt <url>")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+	
+	msg.delete()
+end)
+
 command.add("addFile", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
@@ -246,7 +260,7 @@ local function getConnectedUsers()	-- Function to get all users connected the vo
 end
 
 local function printVote(voteTable)
-	local votesNeeded = math.ceil(getConnectedUsers().count/2)
+	local votesNeeded = math.floor(getConnectedUsers().count-1/2)+1
 	local message = "--------- Skip? ---------\n"..voteTable.answers[1].votes.count.."/"..votesNeeded.." votes needed to skip"
 	return message
 end
