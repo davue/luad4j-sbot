@@ -19,6 +19,28 @@ command.add("weareone", function(msg, args)
 	msg.delete()
 end)
 
+command.add("add", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
+				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
+			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+				connectedChannel.getAudioChannel().queueFile(os.capture("curl -s http://46.105.132.36/getvideo.php?videoid=".. args[1] .."&format=best"))
+			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
+				connectedChannel.getAudioChannel().queueURL(args[1])
+			else -- It's probably a file
+				connectedChannel.getAudioChannel().queueFile(args[1])
+			end
+		else
+			msg.getChannel().sendMessage("[INFO] Usage: add <url/file>\n[INFO] Supports Soundcloud, YouTube and direct links as well as local filepaths.")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+	
+	msg.delete()
+end)
+
 command.add("sc", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
