@@ -262,7 +262,7 @@ command.add("skip", function(msg, args)
 				vote.toggle("skip", 1, msg.getAuthor().getID())
 			end
 			
-			local votesNeeded = math.floor(getConnectedUsers().count/2)+1
+			local votesNeeded = math.floor(getConnectedUsers().count-1/2)+1
 			if(vote.get("skip").answers[1].votes.count == votesNeeded) then
 				voteMessage.edit("Vote passed, skipping...")
 				connectedChannel.getAudioChannel().skip()
