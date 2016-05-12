@@ -32,63 +32,7 @@ command.add("add", function(msg, args)
 				connectedChannel.getAudioChannel().queueFile(args[1])
 			end
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: add <url/file>\n[INFO] Supports Soundcloud, YouTube and direct links as well as local filepaths.")
-		end
-	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
-	end
-	
-	msg.delete()
-end)
-
-command.add("sc", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(#args == 1) then
-			connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
-		else
-			msg.getChannel().sendMessage("[INFO] Usage: sc <url>")
-		end
-	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
-	end
-	
-	msg.delete()
-end)
-
-command.add("yt", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(#args == 1) then
-			connectedChannel.getAudioChannel().queueFile(os.capture("curl -s http://46.105.132.36/getvideo.php?videoid=".. args[1] .."&format=best"))
-		else
-			msg.getChannel().sendMessage("[INFO] Usage: yt <url>")
-		end
-	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
-	end
-	
-	msg.delete()
-end)
-
-command.add("addFile", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(#args == 1) then
-			connectedChannel.getAudioChannel().queueFile(args[1])
-		else
-			msg.getChannel().sendMessage("[INFO] Usage: addFile <soundpath>")
-		end
-	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
-	end
-	
-	msg.delete()
-end)
-
-command.add("addURL", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(#args == 1) then
-			connectedChannel.getAudioChannel().queueURL(args[1])
-		else
-			msg.getChannel().sendMessage("[INFO] Usage: addURL <soundURL>")
+			msg.getChannel().sendMessage("[INFO] Usage: add <url/file>\n[INFO] Supports Soundcloud, YouTube, direct links and local filepaths.")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
