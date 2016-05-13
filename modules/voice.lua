@@ -26,14 +26,18 @@ command.add("add", function(msg, args)
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				local filepath = "mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3"
-				if(not file_exists(filepath)) then
-					os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
-				end
-				
-				if(file_exists(filepath)) then
-					connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+				if(filepath ~= nil) then
+					if(not file_exists(filepath)) then
+						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+					end
+					
+					if(file_exists(filepath)) then
+						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+					else
+						print("[LUA][add] Skipping: "..filepath)
+					end
 				else
-					print("[LUA][add] Skipping: "..filepath)
+					msg.getChannel().sendMessage("[INFO] Video not found")
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				connectedChannel.getAudioChannel().queueURL(args[1])
@@ -55,27 +59,32 @@ command.add("addpl", function(msg, args)
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				processPlaylist = coroutine.create(function ()
-					videoids = os.capture("youtube-dl --yes-playlist --get-id ".. args[1]) -- Get video ID's
-					idtable = {}
-					for id in string.gmatch(videoids, "%S+") do
-						table.insert(idtable, id)
-					end
+					videoids = os.capture("youtube-dl -i --yes-playlist --get-id ".. args[1]) -- Get video ID's
 					
-					msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
-					
-					for k, v in pairs(idtable) do -- Queue all files that exist
-						local filepath = "mp3/"..v..".mp3"
-						local url = "https://www.youtube.com/watch?v="..v
-						
-						if(not file_exists(filepath)) then
-							os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+					if(videoids ~= nil) then -- If there was something fetched
+						idtable = {}
+						for id in string.gmatch(videoids, "%S+") do
+							table.insert(idtable, id)
 						end
 						
-						if(file_exists(filepath)) then
-							connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
-						else
-							print("[LUA][add] Skipping: "..filepath)
+						msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
+						
+						for k, v in pairs(idtable) do -- Queue all files that exist
+							local filepath = "mp3/"..v..".mp3"
+							local url = "https://www.youtube.com/watch?v="..v
+							
+							if(not file_exists(filepath)) then
+								os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+							end
+							
+							if(file_exists(filepath)) then
+								connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+							else
+								print("[LUA][addpl] Skipping: "..filepath)
+							end
 						end
+					else
+						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist")
 					end
 				end)
 				
