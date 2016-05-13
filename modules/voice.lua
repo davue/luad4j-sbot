@@ -65,7 +65,7 @@ command.add("addpl", function(msg, args)
 					local url = "https://www.youtube.com/watch?v="..v
 					
 					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
 					end
 					
 					if(file_exists(filepath)) then
