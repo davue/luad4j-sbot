@@ -25,7 +25,7 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				os.execute("youtube-dl -x --audio-format mp3 -o '/home/dave/discord/mp3/%(id)s.%(ext)s'".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+				os.execute("youtube-dl -x --audio-format mp3 -o '/home/dave/discord/mp3/%(id)s.%(ext)s' ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
 				connectedChannel.getAudioChannel().queueFile("mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3") -- Queue file
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				connectedChannel.getAudioChannel().queueURL(args[1])
