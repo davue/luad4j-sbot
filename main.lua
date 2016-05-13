@@ -95,6 +95,14 @@ function onAudioUnqueuedEvent(event)
 	hook.call("onAudioUnqueued", event)
 end
 
+function onAudioPlayEvent(event)
+	hook.call("onAudioPlay", event)
+end
+
+function onAudioQueuedEvent(event)
+	hook.call("onAudioQueued", event)
+end
+
 function onAudioStopEvent(event)
 	hook.call("onAudioStop", event)
 end
