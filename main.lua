@@ -10,8 +10,6 @@ mainChannel = discord.getChannelByID("165560868426219520") -- stammbot-dev-chann
 ------------------------
 ---- Initialization ----
 ------------------------
-local isConnected = false;
-
 function loadDependencyManager()
 	local func, errorStr = loadfile(libPath.."depends.lua")
 	if(func == nil) then
@@ -39,7 +37,7 @@ end
 function reconnect() -- Try to reconnect to Discord
 	hook.remove("autoreconnect") -- Prevents multiple reconnect attempts at the same time
 	
-	if(not isConnected) then
+	if(not discord.isReady()) then
 		discord.login()
 		setTimer(5000, reconnect) -- Retry in 5sec
 	end
@@ -86,11 +84,8 @@ end)
 ---- Events ----
 ----------------
 function onReadyEvent()
-	isConnected = true;
-	
 	-- Add autoreconnect hook
 	hook.add("onDiscordDisconnected", "autoreconnect", function()
-		isConnected = false;
 		print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
 		setTimer(5000, reconnect)
 	end)
