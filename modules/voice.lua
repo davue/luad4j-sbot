@@ -25,7 +25,7 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				os.execute("youtube-dl -x -f bestaudio[filesize<50M] --audio-format mp3 -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+				os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
 				connectedChannel.getAudioChannel().queueFile("mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3") -- Queue file
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				connectedChannel.getAudioChannel().queueURL(args[1])
@@ -34,6 +34,33 @@ command.add("add", function(msg, args)
 			end
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: add <url/file>\n[INFO] Supports Soundcloud, YouTube, direct links and local filepaths.")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+	
+	msg.delete()
+end)
+
+command.add("addpl", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(#args == 1) then
+			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+				videoids = os.capture("youtube-dl --yes-playlist --get-id ".. args[1]) -- Get video ID's
+				idtable = {}
+				for id in string.gmatch(videoids, "%S+") do
+					table.insert(idtable, id)
+				end
+				
+				os.execute("youtube-dl -x --yes-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download playlist to ~/discord/mp3/(id).mp3
+				for k, v in pairs(idtable) do -- Queue all files
+					connectedChannel.getAudioChannel().queueFile("mp3/"..v..".mp3")
+				end
+			else -- Invalid link format
+				msg.getChannel().sendMessage("[INFO] Invalid link format")
+			end
+		else
+			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url>\n[INFO] Supports only YouTube.")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
