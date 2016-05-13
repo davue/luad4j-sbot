@@ -54,28 +54,32 @@ command.add("addpl", function(msg, args)
 	if(connectedChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				videoids = os.capture("youtube-dl --yes-playlist --get-id ".. args[1]) -- Get video ID's
-				idtable = {}
-				for id in string.gmatch(videoids, "%S+") do
-					table.insert(idtable, id)
-				end
-				
-				msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
-				
-				for k, v in pairs(idtable) do -- Queue all files that exist
-					local filepath = "mp3/"..v..".mp3"
-					local url = "https://www.youtube.com/watch?v="..v
-					
-					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+				processPlaylist = coroutine.create(function ()
+					videoids = os.capture("youtube-dl --yes-playlist --get-id ".. args[1]) -- Get video ID's
+					idtable = {}
+					for id in string.gmatch(videoids, "%S+") do
+						table.insert(idtable, id)
 					end
 					
-					if(file_exists(filepath)) then
-						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
-					else
-						print("[LUA][add] Skipping: "..filepath)
+					msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
+					
+					for k, v in pairs(idtable) do -- Queue all files that exist
+						local filepath = "mp3/"..v..".mp3"
+						local url = "https://www.youtube.com/watch?v="..v
+						
+						if(not file_exists(filepath)) then
+							os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+						end
+						
+						if(file_exists(filepath)) then
+							connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+						else
+							print("[LUA][add] Skipping: "..filepath)
+						end
 					end
-				end
+				end)
+				
+				coroutine.resume(processPlaylist) -- Process playlist concurrently
 			else -- Invalid link format
 				msg.getChannel().sendMessage("[INFO] Invalid link format")
 			end
