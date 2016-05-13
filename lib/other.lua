@@ -8,6 +8,11 @@ table.show(table)
 	Returns a readable representation of a table as string.
 ]]
 
+function file_exists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
 function deepcopy(orig)
 	local orig_type = type(orig)
 	local copy

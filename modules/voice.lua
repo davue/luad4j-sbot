@@ -25,8 +25,16 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
-				connectedChannel.getAudioChannel().queueFile("mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3") -- Queue file
+				local filepath = "mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3"
+				if(not file_exists(filepath)) then
+					os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+				end
+				
+				if(file_exists(filepath)) then
+					connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+				else
+					print("[LUA][add] Skipping: "..filepath)
+				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				connectedChannel.getAudioChannel().queueURL(args[1])
 			else -- It's probably a file
@@ -52,9 +60,19 @@ command.add("addpl", function(msg, args)
 					table.insert(idtable, id)
 				end
 				
-				os.execute("youtube-dl -x --yes-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download playlist to ~/discord/mp3/(id).mp3
-				for k, v in pairs(idtable) do -- Queue all files
-					connectedChannel.getAudioChannel().queueFile("mp3/"..v..".mp3")
+				for k, v in pairs(idtable) do -- Queue all files that exist
+					local filepath = "mp3/"..v..".mp3"
+					local url = "https://www.youtube.com/watch?v="..v
+					
+					if(not file_exists(filepath)) then
+						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+					end
+					
+					if(file_exists(filepath)) then
+						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+					else
+						print("[LUA][add] Skipping: "..filepath)
+					end
 				end
 			else -- Invalid link format
 				msg.getChannel().sendMessage("[INFO] Invalid link format")
