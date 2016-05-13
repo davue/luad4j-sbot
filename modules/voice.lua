@@ -60,6 +60,8 @@ command.add("addpl", function(msg, args)
 					table.insert(idtable, id)
 				end
 				
+				msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
+				
 				for k, v in pairs(idtable) do -- Queue all files that exist
 					local filepath = "mp3/"..v..".mp3"
 					local url = "https://www.youtube.com/watch?v="..v
