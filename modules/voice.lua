@@ -1,4 +1,18 @@
 local connectedChannel = nil -- #table
+local queue = {}
+
+-- Update "Game" representing current title
+hook.Add("onAudioPlay", "updatePlayingTitle", function(audio)
+	for k, v in pairs(queue) do
+		if(k == audio.file) then
+			discord.updatePresence(false, v)
+			return true
+		end
+		
+		discord.updatePresence(false, "Unknown")
+		return false
+	end
+end)
 
 -- We Are One Network
 command.add("weareone", function(msg, args)
@@ -25,13 +39,16 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				local filepath = "mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3"
+				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3"
 				if(filepath ~= nil) then
 					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+						os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
 					end
 					
 					if(file_exists(filepath)) then
+						title = os.capture("youtube-dl -i --no-playlist --get-title ".. args[1])
+						queue[filepath] = title
+						
 						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
 					else
 						print("[LUA][add] Skipping: "..filepath)
@@ -60,14 +77,25 @@ command.add("addpl", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				processPlaylist = coroutine.create(function ()
 					videoids = os.capture("youtube-dl -i --yes-playlist --get-id ".. args[1]) -- Get video ID's
+					titles = os.capture("youtube-dl -i --yes-playlist --get-title ".. args[1]) -- Get video Titles
 					
 					if(videoids ~= nil) then -- If there was something fetched
 						idtable = {}
-						for id in string.gmatch(videoids, "%S+") do
+						titletable = {}
+						
+						for id in string.gmatch(videoids, "%S+") do -- Parse video id's
 							table.insert(idtable, id)
 						end
 						
 						msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
+						
+						for title in string.gmatch(titles, "[^\n^\r]+") do -- Parse video titles
+							table.insert(titletable, title)
+						end
+						
+						for k, v in pairs(idtable) do -- Fill queue table
+							queue["/home/dave/discord/mp3/"..v..".mp3"] = titletable[k]
+						end
 						
 						for k, v in pairs(idtable) do -- Queue all files that exist
 							local filepath = "mp3/"..v..".mp3"
