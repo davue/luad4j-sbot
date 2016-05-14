@@ -1,14 +1,16 @@
 local connectedChannel = nil -- #table
-local queue = {}
+
+if(queue == nil) then -- Only initialize queue once
+	queue = {}
+end
 
 -- Update "Game" representing current title
 hook.add("onAudioPlay", "updatePlayingTitle", function(audio)
-	for k, v in pairs(queue) do
-		if(k == audio.file) then
-			discord.updatePresence(false, v)
-			return true
-		end
-		
+	local title = queue[audio.file]
+	if(title ~= nil and title ~= "") then
+		discord.updatePresence(false, title)
+		return true
+	else
 		discord.updatePresence(false, "Unknown")
 		return false
 	end
@@ -39,7 +41,7 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl --get-id "..args[1])..".mp3"
+				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl -i --get-id "..args[1])..".mp3"
 				if(filepath ~= nil) then
 					if(not file_exists(filepath)) then
 						os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
@@ -47,6 +49,13 @@ command.add("add", function(msg, args)
 					
 					if(file_exists(filepath)) then
 						title = os.capture("youtube-dl -i --no-playlist --get-title ".. args[1])
+						
+						--[[ Clear title
+						title = string.gsub(title, "%b()", "")
+						title = string.gsub(title, "%b[]", "")
+						title = string.gsub(title, "  ", " ")				-- Remove double spaces
+						title = string.gsub(title, "^%s*(.-)%s*$", "%1")]]	-- Remove leading and tailing spaces
+						
 						queue[filepath] = title
 						
 						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
@@ -54,7 +63,7 @@ command.add("add", function(msg, args)
 						print("[LUA][add] Skipping: "..filepath)
 					end
 				else
-					msg.getChannel().sendMessage("[INFO] Video not found")
+					msg.getChannel().sendMessage("[INFO] Video not found.")
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				connectedChannel.getAudioChannel().queueURL(args[1])
@@ -76,8 +85,14 @@ command.add("addpl", function(msg, args)
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				processPlaylist = coroutine.create(function ()
+					local info = mainChannel.sendMessage("[INFO] Fetching video infos...")
 					videoids = os.capture("youtube-dl -i --yes-playlist --get-id ".. args[1]) -- Get video ID's
-					titles = os.capture("youtube-dl -i --yes-playlist --get-title ".. args[1]) -- Get video Titles
+					titles = os.capture("youtube-dl -i --yes-playlist --get-title ".. args[1], true) -- Get video Titles
+					
+					--[[ Clear titles
+					titles = string.gsub(title, "%b()", "")
+					titles = string.gsub(title, "%b[]", "")
+					titles = string.gsub(title, "  ", " ")				-- Remove double spaces]]
 					
 					if(videoids ~= nil) then -- If there was something fetched
 						idtable = {}
@@ -87,19 +102,16 @@ command.add("addpl", function(msg, args)
 							table.insert(idtable, id)
 						end
 						
-						msg.getChannel().sendMessage("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
-						
 						for title in string.gmatch(titles, "[^\n^\r]+") do -- Parse video titles
+							--title = string.gsub(title, "^%s*(.-)%s*$", "%1")	-- Remove leading and tailing spaces
 							table.insert(titletable, title)
 						end
 						
-						for k, v in pairs(idtable) do -- Fill queue table
-							queue["/home/dave/discord/mp3/"..v..".mp3"] = titletable[k]
-						end
-						
+						info.edit("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
 						for k, v in pairs(idtable) do -- Queue all files that exist
-							local filepath = "mp3/"..v..".mp3"
+							local filepath = "/home/dave/discord/mp3/"..v..".mp3"
 							local url = "https://www.youtube.com/watch?v="..v
+							queue[filepath] = titletable[k] -- Fill queue cache
 							
 							if(not file_exists(filepath)) then
 								os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
@@ -111,17 +123,34 @@ command.add("addpl", function(msg, args)
 								print("[LUA][addpl] Skipping: "..filepath)
 							end
 						end
+						
+						info.edit("[INFO] Finished loading ".. #idtable.. " Tracks!")
+						discord.updatePresence(false, queue[connectedChannel.getAudioChannel().getAudioMetaData().getFileSource()])
 					else
-						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist")
+						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist.")
 					end
 				end)
 				
 				coroutine.resume(processPlaylist) -- Process playlist concurrently
 			else -- Invalid link format
-				msg.getChannel().sendMessage("[INFO] Invalid link format")
+				msg.getChannel().sendMessage("[INFO] Invalid link format.")
 			end
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url>\n[INFO] Supports only YouTube.")
+		end
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+	end
+	
+	msg.delete()
+end)
+
+command.add("track", function(msg, args)
+	if(connectedChannel ~= nil) then
+		if(connectedChannel.getAudioChannel().getQueueSize() > 0) then
+			msg.getChannel().sendMessage("[INFO] Current track: ".. queue[connectedChannel.getAudioChannel().getAudioMetaData().getFileSource()])
+		else
+			msg.getChannel().sendMessage("[INFO] There is no queued audio.")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
@@ -291,6 +320,8 @@ hook.add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ende
 		vote.stop("skip")
 		voteMessage.delete()
 	end
+	
+	discord.updatePresence(false, "")
 end)
 
 hook.add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
@@ -315,7 +346,7 @@ local function getConnectedUsers()	-- Function to get all users connected the vo
 end
 
 local function printVote(voteTable)
-	local votesNeeded = math.floor(getConnectedUsers().count-1/2)+1
+	local votesNeeded = math.floor((getConnectedUsers().count-1)/2)+1
 	local message = "--------- Skip? ---------\n"..voteTable.answers[1].votes.count.."/"..votesNeeded.." votes needed to skip"
 	return message
 end
@@ -331,7 +362,7 @@ command.add("skip", function(msg, args)
 				vote.toggle("skip", 1, msg.getAuthor().getID())
 			end
 			
-			local votesNeeded = math.floor(getConnectedUsers().count-1/2)+1
+			local votesNeeded = math.floor((getConnectedUsers().count-1)/2)+1
 			if(vote.get("skip").answers[1].votes.count == votesNeeded) then
 				voteMessage.edit("Vote passed, skipping...")
 				connectedChannel.getAudioChannel().skip()
