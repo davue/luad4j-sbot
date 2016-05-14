@@ -122,7 +122,7 @@ function onPortData(data)
 	mainChannel.sendMessage(data)
 end
 
-hook.add("onDiscordDisconnected", "autoreconnect", function()
+hook.add("onDiscordDisconnected", "autoreconnect", function(reason)
 	print("[LUA] API Disconnected: "..reason.."\n[LUA] Trying to reconnect...")	-- Print the reason why Discord4J lost connection
 	setTimer(5000, reconnect)
 end)
