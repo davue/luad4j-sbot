@@ -2,7 +2,7 @@ local connectedChannel = nil -- #table
 local queue = {}
 
 -- Update "Game" representing current title
-hook.Add("onAudioPlay", "updatePlayingTitle", function(audio)
+hook.add("onAudioPlay", "updatePlayingTitle", function(audio)
 	for k, v in pairs(queue) do
 		if(k == audio.file) then
 			discord.updatePresence(false, v)
