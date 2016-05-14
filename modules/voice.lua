@@ -41,7 +41,7 @@ command.add("add", function(msg, args)
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
 				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl -i --get-id "..args[1])..".mp3"
+				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl -i --no-playlist --get-id "..args[1])..".mp3"
 				if(filepath ~= nil) then
 					if(not file_exists(filepath)) then
 						os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
@@ -320,14 +320,17 @@ hook.add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ende
 		vote.stop("skip")
 		voteMessage.delete()
 	end
-	
-	discord.updatePresence(false, "")
 end)
 
 hook.add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
 	if(vote.get("skip") ~= nil) then
 		vote.stop("skip")
 		voteMessage.delete()
+	end
+	
+	-- AudioStopEvent buggy workaround:
+	if(connectedChannel.getAudioChannel().getQueueSize() <= 1) then
+		discord.updatePresence(false, nil)
 	end
 end)
 
