@@ -270,6 +270,8 @@ command.add("leave", function(msg, args)
 		for i, channel in pairs(voiceChannels) do
 			channel.leave()
 		end
+		
+		connectedChannel = nil
 	else
 		msg.getChannel().sendMessage("[INFO] Admin-only command.")
 	end
@@ -320,6 +322,8 @@ hook.add("onAudioStop", "resetVote", function()		-- Reset vote if audio has ende
 		vote.stop("skip")
 		voteMessage.delete()
 	end
+	
+	discord.updatePresence(false, nil)
 end)
 
 hook.add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was unqueued (skipped)
