@@ -114,8 +114,9 @@ end
 function onUserVoiceChannelJoinEvent(event)
 	hook.call("onUserVoiceChannelJoin", event)
 end
-function onLuaError(reason)
-	mainChannel.sendMessage("[ERROR] An error occured while running the script:\n"..reason)
+
+function onJavaErrorEvent(reason)
+	mainChannel.sendMessage("[ERROR] A Java error occured:\n"..reason)
 end
 
 function onPortData(data)
