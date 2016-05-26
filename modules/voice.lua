@@ -38,6 +38,22 @@ command.add("weareone", function(msg, args)
 	msg.delete()
 end)
 
+local function queueYoutube(title, id)
+		local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+		local url = "https://www.youtube.com/watch?v="..id
+		queue[filepath] = title -- Fill queue cache
+		
+		if(not file_exists(filepath)) then
+			os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+		end
+		
+		if(file_exists(filepath)) then
+			audioChannel.queueFile(filepath) -- Queue file
+		else
+			print("[LUA][addpl] Skipping: "..filepath)
+		end
+end
+
 command.add("add", function(msg, args)
 	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
@@ -80,22 +96,6 @@ command.add("add", function(msg, args)
 	
 	msg.delete()
 end)
-
-local function queueYoutube(title, id)
-		local filepath = "/home/dave/discord/mp3/"..id..".mp3"
-		local url = "https://www.youtube.com/watch?v="..id
-		queue[filepath] = title -- Fill queue cache
-		
-		if(not file_exists(filepath)) then
-			os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
-		end
-		
-		if(file_exists(filepath)) then
-			audioChannel.queueFile(filepath) -- Queue file
-		else
-			print("[LUA][addpl] Skipping: "..filepath)
-		end
-end
 
 command.add("addpl", function(msg, args)
 	if not busy then
