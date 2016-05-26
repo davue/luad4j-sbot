@@ -123,6 +123,7 @@ command.add("addpl", function(msg, args)
 								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
 								i = i + 1
+								trackcount = trackcount + 1
 							else
 								break -- Break loop if no more videos are fetched
 							end
@@ -141,6 +142,7 @@ command.add("addpl", function(msg, args)
 								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
 								i = i + 1
+								trackcount = trackcount + 1
 							else
 								break -- Break loop if no more videos are fetched
 							end
@@ -158,6 +160,7 @@ command.add("addpl", function(msg, args)
 							if(info ~= nil) then
 								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
+								trackcount = trackcount + 1
 							else
 								break -- Break loop if no more videos are fetched
 							end
