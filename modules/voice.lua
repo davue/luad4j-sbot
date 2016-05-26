@@ -1,3 +1,4 @@
+local busy = false
 local cancel = false
 
 if(queue == nil) then -- Only initialize queue once
@@ -99,97 +100,111 @@ local function queueYoutube(title, id)
 end
 
 command.add("addpl", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
-	if(audioChannel ~= nil) then
-		if(#args >= 1) then
-			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				-- Concurrency workaround with timer instead of coroutine
-				-- TODO: Find error why coroutine isn't working
-				setTimer(1, function ()
-					local status = nil
-					local trackcount = 0
-					
-					if(#args == 1) then
-						status = mainChannel.sendMessage("[INFO] Loading all videos from playlist...")
-					
-						i = 1
-						while true do
-							if cancel then -- Cancel logic
-								return false
-							end
-							
-							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
-							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-								queueYoutube(title, id)
-								i = i + 1
-								trackcount = trackcount + 1
-							else
-								break -- Break loop if no more videos are fetched
-							end
-						end
-					elseif(#args == 2) then -- If only the start is specified
-						status = mainChannel.sendMessage("[INFO] Loading videos starting from index ".. args[2].. "...")
+	if not busy then
+		busy = true
+		audioChannel = msg.getGuild().getAudioChannel()
+		if(audioChannel ~= nil) then
+			if(#args >= 1) then
+				if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+					-- Concurrency workaround with timer instead of coroutine
+					-- TODO: Find error why coroutine isn't working
+					setTimer(1, function ()
+						local status = nil
+						local trackcount = 0
 						
-						i = args[2]
-						while true do
-							if cancel then -- Cancel logic
-								return false
+						if(#args == 1) then
+							status = mainChannel.sendMessage("[INFO] Loading all videos from playlist...")
+						
+							i = 1
+							while true do
+								if cancel then -- Cancel logic
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									queueYoutube(title, id)
+									i = i + 1
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
 							end
+						elseif(#args == 2) then -- If only the start is specified
+							status = mainChannel.sendMessage("[INFO] Loading videos starting from index ".. args[2].. "...")
 							
-							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
-							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-								queueYoutube(title, id)
-								i = i + 1
-								trackcount = trackcount + 1
-							else
-								break -- Break loop if no more videos are fetched
+							i = args[2]
+							while true do
+								if cancel then -- Cancel logic
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									queueYoutube(title, id)
+									i = i + 1
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
 							end
+						elseif(#args == 3) then
+							status = mainChannel.sendMessage("[INFO] Loading videos from index ".. args[2].. " to ".. args[3] .."...")
+						
+							for i=args[2], args[3] do
+								if cancel then -- Cancel logic
+									cancel = false
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									queueYoutube(title, id)
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
+							end
+						else
+							msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
 						end
-					elseif(#args == 3) then
-						status = mainChannel.sendMessage("[INFO] Loading videos from index ".. args[2].. " to ".. args[3] .."...")
-					
-						for i=args[2], args[3] do
-							if cancel then -- Cancel logic
-								status.edit("[INFO] Canceled playlist loading.")
-								return false
-							end
-							
-							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
-							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-								queueYoutube(title, id)
-								trackcount = trackcount + 1
-							else
-								break -- Break loop if no more videos are fetched
-							end
+						
+						if(trackcount > 0) then -- If at least one track has been queued
+							status.edit("[INFO] Finished loading ".. trackcount .." Tracks!")
+						else
+							status.edit("[INFO] Couldn't load any videos from playlist!\n[INFO] All videos are probably exceeding 50MB file limit.")
 						end
-					else
-						msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
-					end
-					
-					if(trackcount > 0) then -- If at least one track has been queued
-						status.edit("[INFO] Finished loading ".. trackcount .." Tracks!")
-					else
-						status.edit("[INFO] Couldn't load any videos from playlist!\n[INFO] All videos are probably exceeding 50MB file limit.")
-					end
-				end)
-			else -- Invalid link format
-				msg.getChannel().sendMessage("[INFO] Invalid link format.")
+					end)
+				else -- Invalid link format
+					msg.getChannel().sendMessage("[INFO] Invalid link format.")
+				end
+			else
+				msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
 			end
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
+			msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 		end
+		
+		busy = false
 	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+		msg.getChannel().sendMessage("[INFO] Cannot load multiple playlist at a time.\n[INFO] Cancel other playlist load or wait until it's finished.")
 	end
 	
 	msg.delete()
 end)
 
 command.add("cancel", function(msg,args)
-	cancel = true
+	if busy then
+		cancel = true
+	else
+		cancel = false
+		msg.getChannel().sendMessage("[INFO] There is nothing to cancel.")
+	end
+	
+	msg.delete()
 end)
 
 command.add("track", function(msg, args)
