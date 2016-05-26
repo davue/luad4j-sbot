@@ -80,6 +80,7 @@ command.add("add", function(msg, args)
 	msg.delete()
 end)
 
+-- TODO: Add functionality to cancel playlist load
 command.add("addpl", function(msg, args)
 	audioChannel = msg.getGuild().getAudioChannel();
 	if(audioChannel ~= nil) then

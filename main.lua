@@ -115,8 +115,8 @@ function onUserVoiceChannelJoinEvent(event)
 	hook.call("onUserVoiceChannelJoin", event)
 end
 
-function onJavaErrorEvent(reason)
-	mainChannel.sendMessage("[ERROR] A Java error occured:\n"..reason)
+function onJavaErrorEvent(error)
+	hook.call("onJavaError", error)
 end
 
 function onPortData(data)
