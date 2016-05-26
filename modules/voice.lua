@@ -120,7 +120,7 @@ command.add("addpl", function(msg, args)
 							
 							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
 								i = i + 1
 							else
@@ -138,7 +138,7 @@ command.add("addpl", function(msg, args)
 							
 							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
 								i = i + 1
 							else
@@ -156,7 +156,7 @@ command.add("addpl", function(msg, args)
 							
 							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 							if(info ~= nil) then
-								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 								queueYoutube(title, id)
 							else
 								break -- Break loop if no more videos are fetched
@@ -183,6 +183,10 @@ command.add("addpl", function(msg, args)
 	end
 	
 	msg.delete()
+end)
+
+command.add("cancel", function(msg,args)
+	cancel = true
 end)
 
 command.add("track", function(msg, args)
