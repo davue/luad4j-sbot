@@ -1,5 +1,6 @@
 local busy = false
 local cancel = false
+local volume = 0.5
 
 if(queue == nil) then -- Only initialize queue once
 	queue = {}
@@ -19,7 +20,7 @@ end)
 
 -- We Are One Network
 command.add("weareone", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(audioChannel.getQueueSize() == 0) then
 			if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
@@ -38,7 +39,7 @@ command.add("weareone", function(msg, args)
 end)
 
 command.add("add", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
@@ -102,7 +103,7 @@ end
 command.add("addpl", function(msg, args)
 	if not busy then
 		busy = true
-		audioChannel = msg.getGuild().getAudioChannel()
+		local audioChannel = msg.getGuild().getAudioChannel()
 		if(audioChannel ~= nil) then
 			if(#args >= 1) then
 				if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
@@ -207,8 +208,13 @@ command.add("cancel", function(msg,args)
 	msg.delete()
 end)
 
+command.add("status", function(msg, args)
+	local audioChannel = msg.getGuild().getAudioChannel()
+	msg.getChannel().sendMessage("```\nCurrent Track:".. queue[audioChannel.getAudioMetaData().getFileSource()] .."\nVolume: ".. volume .."\nQueue Length: ".. audioChannel.getQueueSize() .." \n```")
+end)
+
 command.add("track", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(audioChannel.getQueueSize() > 0) then
 			msg.getChannel().sendMessage("[INFO] Current track: ".. queue[audioChannel.getAudioMetaData().getFileSource()])
@@ -223,7 +229,7 @@ command.add("track", function(msg, args)
 end)
 
 command.add("stop", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	local audioChannel = msg.getGuild().getAudioChannel();
 	if(audioChannel ~= nil) then
 		audioChannel.clearQueue()
 	else
@@ -234,10 +240,11 @@ command.add("stop", function(msg, args)
 end)
 
 command.add("volume", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 			audioChannel.setVolume(args[1])
+			volume = args[1]
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: volume <0 - 1>")
 		end
@@ -249,7 +256,7 @@ command.add("volume", function(msg, args)
 end)
 
 command.add("pause", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	local audioChannel = msg.getGuild().getAudioChannel();
 	if(audioChannel ~= nil) then
 		audioChannel.pause()
 	else
@@ -260,7 +267,7 @@ command.add("pause", function(msg, args)
 end)
 
 command.add("resume", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		audioChannel.resume()
 	else
@@ -271,8 +278,8 @@ command.add("resume", function(msg, args)
 end)
 
 command.add("join", function(msg, args)
-	voiceChannels = msg.getGuild().getVoiceChannels()
-	connectedChannels = discord.getConnectedVoiceChannels()
+	local voiceChannels = msg.getGuild().getVoiceChannels()
+	local connectedChannels = discord.getConnectedVoiceChannels()
 	
 	if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
 		if(not voiceChannels[1].isConnected()) then
@@ -282,8 +289,8 @@ command.add("join", function(msg, args)
 		end
 	elseif(#voiceChannels >= 1) then -- if there are more than one voice channels
 		if(#args == 1) then -- when there are one or more arguments passed
-			channelExists = false;
-			alreadyInChannel = false;
+			local channelExists = false;
+			local alreadyInChannel = false;
 			
 			for k, channel in pairs(voiceChannels) do
 				for i, conChannel in pairs(connectedChannels) do
@@ -335,8 +342,8 @@ command.add("leave", function(msg, args)
 end)
 
 command.add("lssounds", function(msg, args)
-	lsStr = os.capture("ls sounds")
-	soundlist = ""
+	local lsStr = os.capture("ls sounds")
+	local soundlist = ""
 	for file in string.gmatch(lsStr, "%a+.wav") do 
 		soundlist = soundlist .. file .. "\r\n"
 	end
@@ -344,7 +351,7 @@ command.add("lssounds", function(msg, args)
 end)
 
 command.add("skip", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel()
+	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		audioChannel.skip()
 	else
@@ -446,4 +453,11 @@ local voiceChannels = discord.getConnectedVoiceChannels()	-- Leave all voice cha
 
 for i, channel in pairs(voiceChannels) do
 	channel.leave()
+end
+
+for i, guild in pairs(discord.getGuilds()) do
+	local audioChannel = guild.getAudioChannel()
+	if(audioChannel ~= nil) then
+		audioChannel.setVolume(0.5)
+	end
 end
