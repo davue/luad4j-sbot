@@ -1,3 +1,5 @@
+local cancel = false
+
 if(queue == nil) then -- Only initialize queue once
 	queue = {}
 end
@@ -16,7 +18,7 @@ end)
 
 -- We Are One Network
 command.add("weareone", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(audioChannel.getQueueSize() == 0) then
 			if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
@@ -35,7 +37,7 @@ command.add("weareone", function(msg, args)
 end)
 
 command.add("add", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
@@ -82,9 +84,9 @@ end)
 
 -- TODO: Add functionality to cancel playlist load
 command.add("addpl", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
-		if(#args == 1) then
+		if(#args >= 1) then
 			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				-- Concurrency workaround with timer instead of coroutine
 				-- TODO: Find error why coroutine isn't working
@@ -97,7 +99,7 @@ command.add("addpl", function(msg, args)
 					titles = string.gsub(title, "%b[]", "")
 					titles = string.gsub(title, "  ", " ")				-- Remove double spaces]]
 					
-					if(videoids ~= nil) then -- If there was something fetched
+					if(infos ~= nil) then -- If there was something fetched
 						idtable = {}
 						titletable = {}
 						
@@ -137,7 +139,7 @@ command.add("addpl", function(msg, args)
 				msg.getChannel().sendMessage("[INFO] Invalid link format.")
 			end
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url>\n[INFO] Supports only YouTube.")
+			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
 		end
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
@@ -147,7 +149,7 @@ command.add("addpl", function(msg, args)
 end)
 
 command.add("track", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(audioChannel.getQueueSize() > 0) then
 			msg.getChannel().sendMessage("[INFO] Current track: ".. queue[audioChannel.getAudioMetaData().getFileSource()])
@@ -173,7 +175,7 @@ command.add("stop", function(msg, args)
 end)
 
 command.add("volume", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
 			audioChannel.setVolume(args[1])
@@ -199,7 +201,7 @@ command.add("pause", function(msg, args)
 end)
 
 command.add("resume", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		audioChannel.resume()
 	else
@@ -283,7 +285,7 @@ command.add("lssounds", function(msg, args)
 end)
 
 command.add("skip", function(msg, args)
-	audioChannel = msg.getGuild().getAudioChannel();
+	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
 		audioChannel.skip()
 	else
