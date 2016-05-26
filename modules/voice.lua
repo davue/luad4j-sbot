@@ -89,9 +89,8 @@ command.add("addpl", function(msg, args)
 				-- Concurrency workaround with timer instead of coroutine
 				-- TODO: Find error why coroutine isn't working
 				setTimer(1, function ()
-					local info = mainChannel.sendMessage("[INFO] Fetching video infos...")
-					videoids = os.capture("youtube-dl -i --yes-playlist --get-id ".. args[1]) -- Get video ID's
-					titles = os.capture("youtube-dl -i --yes-playlist --get-title ".. args[1], true) -- Get video Titles
+					local status = mainChannel.sendMessage("[INFO] Fetching video infos...")
+					infos = os.capture("youtube-dl -i --yes-playlist --get-title --get-id ".. args[1], true)
 					
 					--[[ Clear titles
 					titles = string.gsub(title, "%b()", "")
@@ -102,16 +101,16 @@ command.add("addpl", function(msg, args)
 						idtable = {}
 						titletable = {}
 						
-						for id in string.gmatch(videoids, "%S+") do -- Parse video id's
-							table.insert(idtable, id)
+						local i = 1
+						for info in string.gmatch(infos, "[^\n^\r]+") do
+							if(i%2 == 1) then
+								table.insert(titletable, info)
+							else
+								table.insert(idtable, info)
+							end
 						end
 						
-						for title in string.gmatch(titles, "[^\n^\r]+") do -- Parse video titles
-							--title = string.gsub(title, "^%s*(.-)%s*$", "%1")	-- Remove leading and tailing spaces
-							table.insert(titletable, title)
-						end
-						
-						info.edit("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
+						status.edit("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
 						for k, v in pairs(idtable) do -- Queue all files that exist
 							local filepath = "/home/dave/discord/mp3/"..v..".mp3"
 							local url = "https://www.youtube.com/watch?v="..v
@@ -128,7 +127,7 @@ command.add("addpl", function(msg, args)
 							end
 						end
 						
-						info.edit("[INFO] Finished loading ".. #idtable.. " Tracks!")
+						status.edit("[INFO] Finished loading ".. #idtable.. " Tracks!")
 						discord.updatePresence(false, queue[audioChannel.getAudioMetaData().getFileSource()])
 					else
 						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist.")
