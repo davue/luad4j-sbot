@@ -82,7 +82,22 @@ command.add("add", function(msg, args)
 	msg.delete()
 end)
 
--- TODO: Add functionality to cancel playlist load
+local function queueYoutube(title, id)
+		local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+		local url = "https://www.youtube.com/watch?v="..id
+		queue[filepath] = title -- Fill queue cache
+		
+		if(not file_exists(filepath)) then
+			os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+		end
+		
+		if(file_exists(filepath)) then
+			audioChannel.queueFile(filepath) -- Queue file
+		else
+			print("[LUA][addpl] Skipping: "..filepath)
+		end
+end
+
 command.add("addpl", function(msg, args)
 	audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
@@ -91,48 +106,70 @@ command.add("addpl", function(msg, args)
 				-- Concurrency workaround with timer instead of coroutine
 				-- TODO: Find error why coroutine isn't working
 				setTimer(1, function ()
-					local status = mainChannel.sendMessage("[INFO] Fetching video infos...")
-					infos = os.capture("youtube-dl -i --yes-playlist --get-title --get-id ".. args[1], true)
+					local status = nil
+					local trackcount = 0
 					
-					--[[ Clear titles
-					titles = string.gsub(title, "%b()", "")
-					titles = string.gsub(title, "%b[]", "")
-					titles = string.gsub(title, "  ", " ")				-- Remove double spaces]]
+					if(#args == 1) then
+						status = mainChannel.sendMessage("[INFO] Loading all videos from playlist...")
 					
-					if(infos ~= nil) then -- If there was something fetched
-						idtable = {}
-						titletable = {}
-						
-						local i = 1
-						for info in string.gmatch(infos, "[^\n^\r]+") do
-							if(i%2 == 1) then
-								table.insert(titletable, info)
-							else
-								table.insert(idtable, info)
-							end
-						end
-						
-						status.edit("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
-						for k, v in pairs(idtable) do -- Queue all files that exist
-							local filepath = "/home/dave/discord/mp3/"..v..".mp3"
-							local url = "https://www.youtube.com/watch?v="..v
-							queue[filepath] = titletable[k] -- Fill queue cache
-							
-							if(not file_exists(filepath)) then
-								os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+						i = 1
+						while true do
+							if cancel then -- Cancel logic
+								return false
 							end
 							
-							if(file_exists(filepath)) then
-								audioChannel.queueFile(filepath) -- Queue file
+							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+							if(info ~= nil) then
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								queueYoutube(title, id)
+								i = i + 1
 							else
-								print("[LUA][addpl] Skipping: "..filepath)
+								break -- Break loop if no more videos are fetched
 							end
 						end
+					elseif(#args == 2) then -- If only the start is specified
+						status = mainChannel.sendMessage("[INFO] Loading videos starting from index ".. args[2].. "...")
 						
-						status.edit("[INFO] Finished loading ".. #idtable.. " Tracks!")
-						discord.updatePresence(false, queue[audioChannel.getAudioMetaData().getFileSource()])
+						i = args[2]
+						while true do
+							if cancel then -- Cancel logic
+								return false
+							end
+							
+							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+							if(info ~= nil) then
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								queueYoutube(title, id)
+								i = i + 1
+							else
+								break -- Break loop if no more videos are fetched
+							end
+						end
+					elseif(#args == 3) then
+						status = mainChannel.sendMessage("[INFO] Loading videos from index ".. args[2].. " to ".. args[3] .."...")
+					
+						for i=args[2], args[3] do
+							if cancel then -- Cancel logic
+								status.edit("[INFO] Canceled playlist loading.")
+								return false
+							end
+							
+							local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+							if(info ~= nil) then
+								local title, id = string.match(info, "(.+)[\n\r]+(.+)")
+								queueYoutube(title, id)
+							else
+								break -- Break loop if no more videos are fetched
+							end
+						end
 					else
-						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist.")
+						msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
+					end
+					
+					if(trackcount > 0) then -- If at least one track has been queued
+						status.edit("[INFO] Finished loading ".. trackcount .." Tracks!")
+					else
+						status.edit("[INFO] Couldn't load any videos from playlist!\n[INFO] All videos are probably exceeding 50MB file limit.")
 					end
 				end)
 			else -- Invalid link format
