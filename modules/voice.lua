@@ -59,16 +59,12 @@ command.add("add", function(msg, args)
 					else
 						print("[LUA][addpl] Skipping: "..filepath)
 					end
-				else
-					break -- Break loop if no more videos are fetched
 				end
 			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
 				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
 				if(info ~= nil) then
 					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 					queueYoutube(title, id)
-				else
-					break -- Break loop if no more videos are fetched
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				audioChannel.queueURL(args[1])
