@@ -38,22 +38,6 @@ command.add("weareone", function(msg, args)
 	msg.delete()
 end)
 
-local function queueYoutube(title, id)
-		local filepath = "/home/dave/discord/mp3/"..id..".mp3"
-		local url = "https://www.youtube.com/watch?v="..id
-		queue[filepath] = title -- Fill queue cache
-		
-		if(not file_exists(filepath)) then
-			os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
-		end
-		
-		if(file_exists(filepath)) then
-			audioChannel.queueFile(filepath) -- Queue file
-		else
-			print("[LUA][addpl] Skipping: "..filepath)
-		end
-end
-
 command.add("add", function(msg, args)
 	local audioChannel = msg.getGuild().getAudioChannel()
 	if(audioChannel ~= nil) then
@@ -80,7 +64,19 @@ command.add("add", function(msg, args)
 				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
 				if(info ~= nil) then
 					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-					queueYoutube(title, id)
+						local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+						local url = "https://www.youtube.com/watch?v="..id
+						queue[filepath] = title -- Fill queue cache
+						
+						if(not file_exists(filepath)) then
+							os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+						end
+						
+						if(file_exists(filepath)) then
+							audioChannel.queueFile(filepath) -- Queue file
+						else
+							print("[LUA][addpl] Skipping: "..filepath)
+						end
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				audioChannel.queueURL(args[1])
@@ -122,7 +118,19 @@ command.add("addpl", function(msg, args)
 								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 								if(info ~= nil) then
 									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-									queueYoutube(title, id)
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
 									i = i + 1
 									trackcount = trackcount + 1
 								else
@@ -141,7 +149,19 @@ command.add("addpl", function(msg, args)
 								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 								if(info ~= nil) then
 									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-									queueYoutube(title, id)
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
 									i = i + 1
 									trackcount = trackcount + 1
 								else
@@ -160,7 +180,19 @@ command.add("addpl", function(msg, args)
 								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
 								if(info ~= nil) then
 									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
-									queueYoutube(title, id)
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
 									trackcount = trackcount + 1
 								else
 									break -- Break loop if no more videos are fetched
