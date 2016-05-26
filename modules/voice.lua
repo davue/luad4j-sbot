@@ -43,31 +43,32 @@ command.add("add", function(msg, args)
 	if(audioChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
-				audioChannel.queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
-			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl -i --no-playlist --get-id "..args[1])..".mp3"
-				if(filepath ~= nil) then
+				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
+				if(info ~= nil) then
+					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+					local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+					local url = "http://api.soundcloud.com/tracks/"..id
+					queue[filepath] = title -- Fill queue cache
+					
 					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+						os.execute("youtube-dl -x --no-playlist --playlist-items 1 --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
 					end
 					
 					if(file_exists(filepath)) then
-						title = os.capture("youtube-dl -i --no-playlist --get-title ".. args[1])
-						
-						--[[ Clear title
-						title = string.gsub(title, "%b()", "")
-						title = string.gsub(title, "%b[]", "")
-						title = string.gsub(title, "  ", " ")				-- Remove double spaces
-						title = string.gsub(title, "^%s*(.-)%s*$", "%1")]]	-- Remove leading and tailing spaces
-						
-						queue[filepath] = title
-						
 						audioChannel.queueFile(filepath) -- Queue file
 					else
-						print("[LUA][add] Skipping: "..filepath)
+						print("[LUA][addpl] Skipping: "..filepath)
 					end
 				else
-					msg.getChannel().sendMessage("[INFO] Video not found.")
+					break -- Break loop if no more videos are fetched
+				end
+			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
+				if(info ~= nil) then
+					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+					queueYoutube(title, id)
+				else
+					break -- Break loop if no more videos are fetched
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
 				audioChannel.queueURL(args[1])
