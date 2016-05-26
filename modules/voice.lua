@@ -210,7 +210,7 @@ end)
 
 command.add("status", function(msg, args)
 	local audioChannel = msg.getGuild().getAudioChannel()
-	msg.getChannel().sendMessage("```\nCurrent Track:".. queue[audioChannel.getAudioMetaData().getFileSource()] .."\nVolume: ".. volume .."\nQueue Length: ".. audioChannel.getQueueSize() .." \n```")
+	msg.getChannel().sendMessage("```\nCurrent Track: ".. queue[audioChannel.getAudioMetaData().getFileSource()] .."\nVolume: ".. volume .."\nQueue Length: ".. audioChannel.getQueueSize() .." \n```")
 end)
 
 command.add("track", function(msg, args)
