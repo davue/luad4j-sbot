@@ -43,7 +43,7 @@ command.add("add", function(msg, args)
 	if(audioChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
-				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
+				local info = os.capture("youtube-dl -i --playlist-items 1 --get-title --get-id  ".. args[1], true)
 				if(info ~= nil) then
 					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
 					local filepath = "/home/dave/discord/mp3/"..id..".mp3"
@@ -51,7 +51,7 @@ command.add("add", function(msg, args)
 					queue[filepath] = title -- Fill queue cache
 					
 					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x --no-playlist --playlist-items 1 --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+						os.execute("youtube-dl -x -i --playlist-items 1 --audio-format mp3 -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
 					end
 					
 					if(file_exists(filepath)) then
@@ -69,7 +69,7 @@ command.add("add", function(msg, args)
 						queue[filepath] = title -- Fill queue cache
 						
 						if(not file_exists(filepath)) then
-							os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+							os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
 						end
 						
 						if(file_exists(filepath)) then
