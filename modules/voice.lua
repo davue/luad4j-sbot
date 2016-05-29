@@ -6,18 +6,6 @@ if(queue == nil) then -- Only initialize queue once
 	queue = {}
 end
 
--- Update "Game" representing current title
-hook.add("onAudioPlay", "updatePlayingTitle", function(audio)
-	local title = queue[audio.file]
-	if(title ~= nil and title ~= "") then
-		discord.updatePresence(false, title)
-		return true
-	else
-		discord.updatePresence(false, "Unknown")
-		return false
-	end
-end)
-
 -- We Are One Network
 command.add("weareone", function(msg, args)
 	local audioChannel = msg.getGuild().getAudioChannel()
