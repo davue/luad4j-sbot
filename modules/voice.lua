@@ -1,4 +1,6 @@
-local connectedChannel = nil -- #table
+local busy = false
+local cancel = false
+local volume = 0.5
 
 if(queue == nil) then -- Only initialize queue once
 	queue = {}
@@ -18,10 +20,11 @@ end)
 
 -- We Are One Network
 command.add("weareone", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(connectedChannel.getAudioChannel().getQueueSize() == 0) then
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
+		if(audioChannel.getQueueSize() == 0) then
 			if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
-				connectedChannel.getAudioChannel().queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls")
+				audioChannel.queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls")
 			else
 				msg.getChannel().sendMessage("[INFO] Usage: weareone (technobase/housetime/hardbase/trancebase/coretime/clubtime)")
 			end
@@ -36,39 +39,49 @@ command.add("weareone", function(msg, args)
 end)
 
 command.add("add", function(msg, args)
-	if(connectedChannel ~= nil) then
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
 		if(#args == 1) then
 			if(string.find(args[1], "https?://w*%.?soundcloud%.com.+") ~= nil) then -- If it's a soundcloud link
-				connectedChannel.getAudioChannel().queueURL("http://davue.dns1.us/soundcloudtomp3.php?url=".. args[1])
-			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				local filepath = "/home/dave/discord/mp3/"..os.capture("youtube-dl -i --no-playlist --get-id "..args[1])..".mp3"
-				if(filepath ~= nil) then
+				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
+				if(info ~= nil) then
+					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+					local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+					local url = "http://api.soundcloud.com/tracks/"..id
+					queue[filepath] = title -- Fill queue cache
+					
 					if(not file_exists(filepath)) then
-						os.execute("youtube-dl -x -i --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. args[1]) -- Download mp3 to ~/discord/mp3/(id).mp3
+						os.execute("youtube-dl -x --no-playlist --playlist-items 1 --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
 					end
 					
 					if(file_exists(filepath)) then
-						title = os.capture("youtube-dl -i --no-playlist --get-title ".. args[1])
-						
-						--[[ Clear title
-						title = string.gsub(title, "%b()", "")
-						title = string.gsub(title, "%b[]", "")
-						title = string.gsub(title, "  ", " ")				-- Remove double spaces
-						title = string.gsub(title, "^%s*(.-)%s*$", "%1")]]	-- Remove leading and tailing spaces
-						
-						queue[filepath] = title
-						
-						connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
+						audioChannel.queueFile(filepath) -- Queue file
 					else
-						print("[LUA][add] Skipping: "..filepath)
+						print("[LUA][addpl] Skipping: "..filepath)
 					end
-				else
-					msg.getChannel().sendMessage("[INFO] Video not found.")
+				end
+			elseif(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+				local info = os.capture("youtube-dl -i --no-playlist --get-title --get-id --playlist-items 1 ".. args[1], true)
+				if(info ~= nil) then
+					local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+						local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+						local url = "https://www.youtube.com/watch?v="..id
+						queue[filepath] = title -- Fill queue cache
+						
+						if(not file_exists(filepath)) then
+							os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+						end
+						
+						if(file_exists(filepath)) then
+							audioChannel.queueFile(filepath) -- Queue file
+						else
+							print("[LUA][addpl] Skipping: "..filepath)
+						end
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
-				connectedChannel.getAudioChannel().queueURL(args[1])
+				audioChannel.queueURL(args[1])
 			else -- It's probably a file
-				connectedChannel.getAudioChannel().queueFile(args[1])
+				audioChannel.queueFile(args[1])
 			end
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: add <url/file>\n[INFO] Supports Soundcloud, YouTube, direct links and local filepaths.")
@@ -81,74 +94,160 @@ command.add("add", function(msg, args)
 end)
 
 command.add("addpl", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(#args == 1) then
-			if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
-				processPlaylist = coroutine.create(function ()
-					local info = mainChannel.sendMessage("[INFO] Fetching video infos...")
-					videoids = os.capture("youtube-dl -i --yes-playlist --get-id ".. args[1]) -- Get video ID's
-					titles = os.capture("youtube-dl -i --yes-playlist --get-title ".. args[1], true) -- Get video Titles
-					
-					--[[ Clear titles
-					titles = string.gsub(title, "%b()", "")
-					titles = string.gsub(title, "%b[]", "")
-					titles = string.gsub(title, "  ", " ")				-- Remove double spaces]]
-					
-					if(videoids ~= nil) then -- If there was something fetched
-						idtable = {}
-						titletable = {}
+	if not busy then
+		busy = true
+		local audioChannel = msg.getGuild().getAudioChannel()
+		if(audioChannel ~= nil) then
+			if(#args >= 1) then
+				if(string.find(args[1], "https?://w*%.?youtube%.com.+") ~= nil) then -- If it's a youtube link
+					-- Concurrency workaround with timer instead of coroutine
+					-- TODO: Find error why coroutine isn't working
+					setTimer(1, function ()
+						local status = nil
+						local trackcount = 0
 						
-						for id in string.gmatch(videoids, "%S+") do -- Parse video id's
-							table.insert(idtable, id)
-						end
+						if(#args == 1) then
+							status = mainChannel.sendMessage("[INFO] Loading all videos from playlist...")
 						
-						for title in string.gmatch(titles, "[^\n^\r]+") do -- Parse video titles
-							--title = string.gsub(title, "^%s*(.-)%s*$", "%1")	-- Remove leading and tailing spaces
-							table.insert(titletable, title)
-						end
-						
-						info.edit("[INFO] Loading ".. #idtable.. " Tracks. This can take a while...")
-						for k, v in pairs(idtable) do -- Queue all files that exist
-							local filepath = "/home/dave/discord/mp3/"..v..".mp3"
-							local url = "https://www.youtube.com/watch?v="..v
-							queue[filepath] = titletable[k] -- Fill queue cache
-							
-							if(not file_exists(filepath)) then
-								os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+							i = 1
+							while true do
+								if cancel then -- Cancel logic
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
+									i = i + 1
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
 							end
+						elseif(#args == 2) then -- If only the start is specified
+							status = mainChannel.sendMessage("[INFO] Loading videos starting from index ".. args[2].. "...")
 							
-							if(file_exists(filepath)) then
-								connectedChannel.getAudioChannel().queueFile(filepath) -- Queue file
-							else
-								print("[LUA][addpl] Skipping: "..filepath)
+							i = args[2]
+							while true do
+								if cancel then -- Cancel logic
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
+									i = i + 1
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
 							end
+						elseif(#args == 3) then
+							status = mainChannel.sendMessage("[INFO] Loading videos from index ".. args[2].. " to ".. args[3] .."...")
+						
+							for i=args[2], args[3] do
+								if cancel then -- Cancel logic
+									cancel = false
+									return false
+								end
+								
+								local info = os.capture("youtube-dl -i --yes-playlist --get-title --get-id --playlist-items ".. i .." ".. args[1], true)
+								if(info ~= nil) then
+									local title, id = string.match(info, "(.+)[\n\r]+(.+)[\n\r]+")
+									local filepath = "/home/dave/discord/mp3/"..id..".mp3"
+									local url = "https://www.youtube.com/watch?v="..id
+									queue[filepath] = title -- Fill queue cache
+									
+									if(not file_exists(filepath)) then
+										os.execute("youtube-dl -x --no-playlist --audio-format mp3 -f bestaudio[filesize<50M] -o /home/dave/discord/mp3/%(id)s.%(ext)s ".. url) -- Download mp3 to ~/discord/mp3/(id).mp3
+									end
+									
+									if(file_exists(filepath)) then
+										audioChannel.queueFile(filepath) -- Queue file
+									else
+										print("[LUA][addpl] Skipping: "..filepath)
+									end
+									trackcount = trackcount + 1
+								else
+									break -- Break loop if no more videos are fetched
+								end
+							end
+						else
+							msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
 						end
 						
-						info.edit("[INFO] Finished loading ".. #idtable.. " Tracks!")
-						discord.updatePresence(false, queue[connectedChannel.getAudioChannel().getAudioMetaData().getFileSource()])
-					else
-						msg.getChannel().sendMessage("[INFO] Could not fetch any videos from playlist.")
-					end
-				end)
-				
-				coroutine.resume(processPlaylist) -- Process playlist concurrently
-			else -- Invalid link format
-				msg.getChannel().sendMessage("[INFO] Invalid link format.")
+						if(trackcount > 0) then -- If at least one track has been queued
+							status.edit("[INFO] Finished loading ".. trackcount .." Tracks!")
+						else
+							status.edit("[INFO] Couldn't load any videos from playlist!\n[INFO] All videos are probably exceeding 50MB file limit.")
+						end
+					end)
+				else -- Invalid link format
+					msg.getChannel().sendMessage("[INFO] Invalid link format.")
+				end
+			else
+				msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url> [start] [end]\n[INFO] Supports only YouTube.")
 			end
 		else
-			msg.getChannel().sendMessage("[INFO] Usage: addpl <playlist url>\n[INFO] Supports only YouTube.")
+			msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 		end
+		
+		busy = false
 	else
-		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
+		msg.getChannel().sendMessage("[INFO] Cannot load multiple playlist at a time.\n[INFO] Cancel other playlist load or wait until it's finished.")
 	end
 	
 	msg.delete()
 end)
 
+command.add("cancel", function(msg,args)
+	if busy then
+		cancel = true
+	else
+		cancel = false
+		msg.getChannel().sendMessage("[INFO] There is nothing to cancel.")
+	end
+	
+	msg.delete()
+end)
+
+command.add("status", function(msg, args)
+	local audioChannel = msg.getGuild().getAudioChannel()
+	msg.getChannel().sendMessage("```\nCurrent Track: ".. queue[audioChannel.getAudioMetaData().getFileSource()] .."\nQueue Length:  ".. audioChannel.getQueueSize() .."\nVolume:        ".. volume*100 .."%\n```")
+	msg.delete()
+end)
+
 command.add("track", function(msg, args)
-	if(connectedChannel ~= nil) then
-		if(connectedChannel.getAudioChannel().getQueueSize() > 0) then
-			msg.getChannel().sendMessage("[INFO] Current track: ".. queue[connectedChannel.getAudioChannel().getAudioMetaData().getFileSource()])
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
+		if(audioChannel.getQueueSize() > 0) then
+			msg.getChannel().sendMessage("[INFO] Current track: ".. queue[audioChannel.getAudioMetaData().getFileSource()])
 		else
 			msg.getChannel().sendMessage("[INFO] There is no queued audio.")
 		end
@@ -160,8 +259,9 @@ command.add("track", function(msg, args)
 end)
 
 command.add("stop", function(msg, args)
-	if(connectedChannel ~= nil) then
-		connectedChannel.getAudioChannel().clearQueue()
+	local audioChannel = msg.getGuild().getAudioChannel();
+	if(audioChannel ~= nil) then
+		audioChannel.clearQueue()
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
@@ -170,9 +270,11 @@ command.add("stop", function(msg, args)
 end)
 
 command.add("volume", function(msg, args)
-	if(connectedChannel ~= nil) then
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
 		if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
-			connectedChannel.getAudioChannel().setVolume(args[1])
+			audioChannel.setVolume(args[1])
+			volume = args[1]
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: volume <0 - 1>")
 		end
@@ -184,8 +286,9 @@ command.add("volume", function(msg, args)
 end)
 
 command.add("pause", function(msg, args)
-	if(connectedChannel ~= nil) then
-		connectedChannel.getAudioChannel().pause()
+	local audioChannel = msg.getGuild().getAudioChannel();
+	if(audioChannel ~= nil) then
+		audioChannel.pause()
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
@@ -194,8 +297,9 @@ command.add("pause", function(msg, args)
 end)
 
 command.add("resume", function(msg, args)
-	if(connectedChannel ~= nil) then
-		connectedChannel.getAudioChannel().resume()
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
+		audioChannel.resume()
 	else
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
@@ -204,102 +308,89 @@ command.add("resume", function(msg, args)
 end)
 
 command.add("join", function(msg, args)
-	if(core.isAdmin(msg)) then
-		voiceChannels = msg.getGuild().getVoiceChannels()
-		connectedChannels = discord.getConnectedVoiceChannels()
-		
-		if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
-			if(not voiceChannels[1].isConnected()) then
-				voiceChannels[1].join()
-				connectedChannel = voiceChannels[1]
-			else
-				msg.getChannel().sendMessage("[INFO] I'm already in the voice channel.")
-			end
-		elseif(#voiceChannels >= 1) then -- if there are more than one voice channels
-			if(#args == 1) then -- when there are one or more arguments passed
-				channelExists = false;
-				alreadyInChannel = false;
-				
-				for k, channel in pairs(voiceChannels) do
-					for i, conChannel in pairs(connectedChannels) do
-						if(channel.getID() == conChannel.getID()) then -- if you are already in a channel of the same server
-							channelExists = true
-							alreadyInChannel = true
-							if(channel.getName() == args[1]) then -- if it's the same channel you want to join
-								msg.getChannel().sendMessage("[INFO] I'm already in this voice channel.")
-								break
-							else
-								msg.getChannel().sendMessage("[INFO] I'm already in the voice channel: \"".. channel.getName() .."\".\n[INFO] I can only join one channel per server.")
-								break
-							end
-						end
-					end
-					
-					if(args[1] == channel.getName() and not alreadyInChannel) then -- if there is a channel with name <arg>
-						if(not voiceChannels[k].isConnected()) then
-							voiceChannels[k].join()
-							connectedChannel = voiceChannels[k]
-							channelExists = true
+	local voiceChannels = msg.getGuild().getVoiceChannels()
+	local connectedChannels = discord.getConnectedVoiceChannels()
+	
+	if(#voiceChannels == 1 and #args == 0) then -- if there is only one voice channel -> join this channel
+		if(not voiceChannels[1].isConnected()) then
+			voiceChannels[1].join()
+		else
+			msg.getChannel().sendMessage("[INFO] I'm already in the voice channel.")
+		end
+	elseif(#voiceChannels >= 1) then -- if there are more than one voice channels
+		if(#args == 1) then -- when there are one or more arguments passed
+			local channelExists = false;
+			local alreadyInChannel = false;
+			
+			for k, channel in pairs(voiceChannels) do
+				for i, conChannel in pairs(connectedChannels) do
+					if(channel.getID() == conChannel.getID()) then -- if you are already in a channel of the same server
+						channelExists = true
+						alreadyInChannel = true
+						if(channel.getName() == args[1]) then -- if it's the same channel you want to join
+							msg.getChannel().sendMessage("[INFO] I'm already in this voice channel.")
+							break
+						else
+							msg.getChannel().sendMessage("[INFO] I'm already in the voice channel: \"".. channel.getName() .."\".\n[INFO] I can only join one channel per server.")
 							break
 						end
 					end
 				end
 				
-				if(not channelExists) then
-					msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. args[1] .."\".\n")
+				if(args[1] == channel.getName() and not alreadyInChannel) then -- if there is a channel with name <arg>
+					if(not voiceChannels[k].isConnected()) then
+						voiceChannels[k].join()
+						channelExists = true
+						break
+					end
 				end
-			elseif(#args >= 1) then
-				msg.getChannel().sendMessage("[INFO] I can only join one channel per server.")
-			else -- need one arg to specify channel to leave
-				msg.getChannel().sendMessage("[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: join <channel>")
 			end
-		else
-			msg.getChannel().sendMessage("[INFO] There are no voice channels on this server.")
+			
+			if(not channelExists) then
+				msg.getChannel().sendMessage("[INFO] There is no channel called: \"".. args[1] .."\".\n")
+			end
+		elseif(#args >= 1) then
+			msg.getChannel().sendMessage("[INFO] I can only join one channel per server.")
+		else -- need one arg to specify channel to leave
+			msg.getChannel().sendMessage("[INFO] There are multiple voice channels.\n[INFO] Please specify the voice channel you would like me to join.\n[INFO] Usage: join <channel>")
 		end
 	else
-		msg.getChannel().sendMessage("[INFO] Admin-only command.")
+		msg.getChannel().sendMessage("[INFO] There are no voice channels on this server.")
 	end
 	
 	msg.delete()
 end)
 
 command.add("leave", function(msg, args)
-	if(core.isAdmin(msg)) then
-		local voiceChannels = discord.getConnectedVoiceChannels()
+	local voiceChannels = discord.getConnectedVoiceChannels()
 
-		for i, channel in pairs(voiceChannels) do
-			channel.leave()
-		end
-		
-		connectedChannel = nil
-	else
-		msg.getChannel().sendMessage("[INFO] Admin-only command.")
+	for i, channel in pairs(voiceChannels) do
+		channel.leave()
 	end
 	
 	msg.delete()
 end)
 
 command.add("lssounds", function(msg, args)
-	lsStr = os.capture("ls sounds")
-	soundlist = ""
+	local lsStr = os.capture("ls sounds")
+	local soundlist = ""
 	for file in string.gmatch(lsStr, "%a+.wav") do 
 		soundlist = soundlist .. file .. "\r\n"
 	end
 	msg.getChannel().sendMessage(soundlist)
 end)
 
-command.add("fskip", function(msg, args)
-	if(msg == "override" or core.isAdmin(msg)) then
-		if(connectedChannel ~= nil) then
-			connectedChannel.getAudioChannel().skip()
-		else
-			msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
-		end
+command.add("skip", function(msg, args)
+	local audioChannel = msg.getGuild().getAudioChannel()
+	if(audioChannel ~= nil) then
+		audioChannel.skip()
+	else
+		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
 	
 	msg.delete()
 end)
-
+--[[
 ----------------------------
 ---- Skip functionality ----
 ----------------------------
@@ -333,12 +424,12 @@ hook.add("onAudioUnqueued", "resetVote", function()	-- Reset vote if audio was u
 	end
 	
 	-- AudioStopEvent buggy workaround:
-	if(connectedChannel.getAudioChannel().getQueueSize() <= 1) then
+	if(msg.getGuild().getAudioChannel().getQueueSize() <= 1) then
 		discord.updatePresence(false, nil)
 	end
 end)
 
-local function getConnectedUsers()	-- Function to get all users connected the voice channel
+local function getConnectedUsers(connectedChannel)	-- Function to get all users connected to the voice channel
 	connectedUsers = {}
 	connectedUsers.count = 0
 	for k, v in pairs(connectedChannel.getGuild().getUsers()) do
@@ -359,6 +450,7 @@ local function printVote(voteTable)
 end
 
 command.add("skip", function(msg, args)
+	audioChannel = msg.getGuild().getAudioChannel();
 	if(connectedChannel ~= nil) then
 		if(connectedChannel.getAudioChannel().getQueueSize() > 0) then
 			if(vote.get("skip") == nil) then
@@ -383,7 +475,7 @@ command.add("skip", function(msg, args)
 		msg.getChannel().sendMessage("[INFO] I am not in a voice channel.")
 	end
 end)
-
+]]
 --------------
 ---- Init ----
 --------------
@@ -391,4 +483,11 @@ local voiceChannels = discord.getConnectedVoiceChannels()	-- Leave all voice cha
 
 for i, channel in pairs(voiceChannels) do
 	channel.leave()
+end
+
+for i, guild in pairs(discord.getGuilds()) do
+	local audioChannel = guild.getAudioChannel()
+	if(audioChannel ~= nil) then
+		audioChannel.setVolume(0.5)
+	end
 end

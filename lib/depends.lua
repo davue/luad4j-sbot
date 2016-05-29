@@ -20,12 +20,13 @@ local loaded = {libs = {}, modules = {}}	-- Table containing names of loaded lib
 
 function os.capture(cmd, raw)
 	local f = assert(io.popen(cmd, 'r'))
-	local s = assert(f:read('*a'))
+	local s = f:read('*a')
 	f:close()
 	if raw then return s end
-	s = string.gsub(s, '^%s+', '')
-	s = string.gsub(s, '%s+$', '')
-	s = string.gsub(s, '[\n\r]+', ' ')
+	if s == nil then return s end
+		s = string.gsub(s, '^%s+', '')
+		s = string.gsub(s, '%s+$', '')
+		s = string.gsub(s, '[\n\r]+', ' ')
 	return s
 end
 
