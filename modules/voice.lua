@@ -410,3 +410,8 @@ command.add("loop", function(msg, args)
 		audioPlayer.setLoop(true)
 	end
 end)
+
+command.add("shuffle", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	audioPlayer.shuffle()
+end)
