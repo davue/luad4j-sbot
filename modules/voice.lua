@@ -257,7 +257,7 @@ end)
 
 command.add("track", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	if(audioPlayer.playlistSize > 0) then
+	if(audioPlayer.playlistSize() > 0) then
 		msg.getChannel().sendMessage("[INFO] Current track: ".. audioPlayer.getCurrentTrack().getTitle())
 	else
 		msg.getChannel().sendMessage("[INFO] There is no queued audio.")
@@ -410,12 +410,3 @@ command.add("loop", function(msg, args)
 		audioPlayer.setLoop(true)
 	end
 end)
-
---------------
----- Init ----
---------------
-local voiceChannels = discord.getConnectedVoiceChannels()	-- Leave all voice channels on init
-
-for i, channel in pairs(voiceChannels) do
-	channel.leave()
-end
