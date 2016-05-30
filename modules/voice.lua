@@ -5,10 +5,6 @@ local busy = false		-- If something is currently being queued
 local cancel = false		-- If a user wants to cancel the queueing process
 local audioPlayers = {} -- Table with audioPlayers depending on guilds
 
-if(queue == nil) then -- Only initialize queue once
-	queue = {}
-end
-
 --------------------------
 ---- Helper Functions ----
 --------------------------
@@ -32,7 +28,7 @@ command.add("weareone", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() == 0) then
 		if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
-			audioPlayer.queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls")
+			audioPlayer.queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls").setTitle(string.upper(args[1][1])..string.sub(args[1],2))
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: weareone (technobase/housetime/hardbase/trancebase/coretime/clubtime)")
 		end
