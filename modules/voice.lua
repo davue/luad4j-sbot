@@ -272,7 +272,11 @@ command.add("playlist", function(msg, args)
 		local playlist = audioPlayer.getPlaylist()
 		local message = "```"
 		for k, track in pairs(playlist) do
-			message = message..k..": "..track.getTitle().."\n"
+			if(k == 1) then
+				message = message.."-> "..track.getTitle().."\n"
+			else
+				message = message.. k-1 ..": "..track.getTitle().."\n"
+			end
 		end
 		msg.getChannel().sendMessage(message.."```")
 	else
@@ -394,7 +398,7 @@ end)
 command.add("skipto", function(msg, args)
 	if(#args == 1) then
 		local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-		audioPlayer.skipTo(args[1]-1)
+		audioPlayer.skipTo(args[1])
 	else
 		msg.getChannel().sendMessage("[INFO] Usage: skipto <index>")
 	end
