@@ -391,10 +391,10 @@ command.add("skip", function(msg, args)
 	msg.delete()
 end)
 
-command.add("skipTo", function(msg, args)
+command.add("skipto", function(msg, args)
 	if(#args == 1) then
 		local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-		audioPlayer.skipTo(args[1])
+		audioPlayer.skipTo(args[1]-1)
 	else
 		msg.getChannel().sendMessage("[INFO] Usage: skipto <index>")
 	end
