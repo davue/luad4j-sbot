@@ -272,7 +272,7 @@ command.add("playlist", function(msg, args)
 		local playlist = audioPlayer.getPlaylist()
 		local message = "```"
 		for k, track in pairs(playlist) do
-			message = message..k..": "..track.getTitle()
+			message = message..k..": "..track.getTitle().."\n"
 		end
 		msg.getChannel().sendMessage(message.."```")
 	else
