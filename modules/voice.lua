@@ -82,11 +82,11 @@ command.add("add", function(msg, args)
 					end
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
-				audioPlayer.queueURL(args[1]).setTitle("Direct Link")
+				audioPlayer.queueURL(args[1]).setTitle("<Direct Link>")
 				loaded = true
 			else -- It's probably a file
 				if(file_exists(args[1])) then
-					audioPlayer.queueFile(args[1]).setTitle("Local File")
+					audioPlayer.queueFile(args[1]).setTitle("<Local File>")
 				else
 					msg.getChannel().sendMessage("[INFO] Couldn't find file: ".. args[1])
 				end
