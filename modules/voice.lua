@@ -24,7 +24,10 @@ end
 ------------------
 ---- Commands ----
 ------------------
--- We Are One Network
+
+--------------
+-- Queueing --
+--------------
 command.add("weareone", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() == 0) then
@@ -243,6 +246,18 @@ command.add("cancel", function(msg,args)
 	msg.delete()
 end)
 
+----------
+-- Info --
+----------
+command.add("lssounds", function(msg, args)
+	local lsStr = os.capture("ls sounds")
+	local soundlist = ""
+	for file in string.gmatch(lsStr, "%a+.wav") do 
+		soundlist = soundlist .. file .. "\r\n"
+	end
+	msg.getChannel().sendMessage(soundlist)
+end)
+
 command.add("status", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	msg.getChannel().sendMessage("```\nCurrent Track: ".. queue[audioPlayer.getCurrentTrack().getSource()] .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
@@ -260,39 +275,24 @@ command.add("track", function(msg, args)
 	msg.delete()
 end)
 
-command.add("stop", function(msg, args)
+command.add("playlist", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	audioPlayer.skipTo(audioPlayer.playlistSize()+1)
-	
-	msg.delete()
-end)
-
-command.add("volume", function(msg, args)
-	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
-		audioPlayer.setVolume(args[1])
-		volume = args[1]
+	if(audioPlayer.playlistSize() > 0) then
+		local playlist = audioPlayer.getPlaylist()
+		local message = ""
+		for k, track in pairs(playlist) do
+			message = message..k..": "..queue[track.getSource()]
+		end
+		msg.getChannel().sendMessage(message)
 	else
-		msg.getChannel().sendMessage("[INFO] Usage: volume <0 - 1>")
+		msg.getChannel().sendMessage("[INFO] There are no tracks in the playlist.")
 	end
-	
 	msg.delete()
 end)
 
-command.add("pause", function(msg, args)
-	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	audioPlayer.setPaused(true)
-	
-	msg.delete()
-end)
-
-command.add("resume", function(msg, args)
-	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	audioPlayer.setPaused(false)
-	
-	msg.delete()
-end)
-
+---------------------
+-- Channel Control --
+---------------------
 command.add("join", function(msg, args)
 	local voiceChannels = msg.getGuild().getVoiceChannels()
 	local connectedChannels = discord.getConnectedVoiceChannels()
@@ -357,13 +357,40 @@ command.add("leave", function(msg, args)
 	msg.delete()
 end)
 
-command.add("lssounds", function(msg, args)
-	local lsStr = os.capture("ls sounds")
-	local soundlist = ""
-	for file in string.gmatch(lsStr, "%a+.wav") do 
-		soundlist = soundlist .. file .. "\r\n"
+-------------------
+-- Audio Control --
+-------------------
+command.add("stop", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	audioPlayer.skipTo(audioPlayer.playlistSize()+1)
+	
+	msg.delete()
+end)
+
+command.add("volume", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	if(tonumber(args[1]) >= 0 and tonumber(args[1]) <= 1) then
+		audioPlayer.setVolume(args[1])
+		volume = args[1]
+	else
+		msg.getChannel().sendMessage("[INFO] Usage: volume <0 - 1>")
 	end
-	msg.getChannel().sendMessage(soundlist)
+	
+	msg.delete()
+end)
+
+command.add("pause", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	audioPlayer.setPaused(true)
+	
+	msg.delete()
+end)
+
+command.add("resume", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	audioPlayer.setPaused(false)
+	
+	msg.delete()
 end)
 
 command.add("skip", function(msg, args)
