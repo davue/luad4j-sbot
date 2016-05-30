@@ -2,7 +2,6 @@ depends.onLib("hook")
 
 --[[ Command Lib - Docs:
 The command library contains the chat command handling of the bot
-
 command.add(string: command, function: cb_func)
 	Adds a chat command which can be called via !<command>.
 	The callback function gets 2 arguments:
@@ -18,47 +17,9 @@ command.call(string: command, table: msg, table: args)
 
 command = {} -- Table containing the commmand library
 local chatCommands = {} -- chatCommands[command] = function of command
---[[
-Possible command structure:
-command.add(command, description, function)
 
-command.add("Tests:test string:arg1 number:arg2", "A test command", function(msg, args)
-	...
-end)
-
-command table:
-	chatCommands[command].call = function: func
-	chatCommands[command].params = table: params
-	chatCommands[command].desc = string: description
-	
-	chatCommands[command].call = function(msg, args) ... end
-	chatCommands[command].params = {"string:arg1", "number:arg2"}
-	chatCommands[command].desc = "A test command"
-]]
-
-function command.add(command, description, func)
-	if(chatCommands[command] == nil) then
-		-- TODO:
-		-- 1. split command by spaces
-		-- 2. check for category in 1. part
-		-- 3. parse parameters
-		beginIndex, endIndex, text = string.find(command, "(%w+):%w+%s")
-		chatCommands[command] = {}
-		chatCommands[command].call = func
-		chatCommands[command].desc = description
-		chatCommands[command].params = {}
-		
-		local temp = {}
-		for subString in string.gmatch(command, "%S+") do
-			table.insert(temp, subString)
-		end
-		table.remove(temp,1)
-		
-		return true
-	else
-		hook.call("LuaError", "Failed to add command: Command already exists")
-		return false
-	end
+function command.add(command, func)
+	chatCommands[command] = func
 end
 
 function command.remove(command)
