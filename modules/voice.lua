@@ -406,12 +406,18 @@ command.add("loop", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.isLooping()) then
 		audioPlayer.setLoop(false)
+		msg.getChannel().sendMessage("[INFO] Looping disabled.")
 	else
 		audioPlayer.setLoop(true)
+		msg.getChannel().sendMessage("[INFO] Looping enabled.")
 	end
+	
+	msg.delete()
 end)
 
 command.add("shuffle", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	audioPlayer.shuffle()
+	
+	msg.delete()
 end)
