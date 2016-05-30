@@ -251,7 +251,7 @@ end)
 
 command.add("status", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getTitle() .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nLooping:       ".. audioPlayer.isLooping() .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
+	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getTitle() .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nLooping:       ".. tostring(audioPlayer.isLooping()) .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
 	msg.delete()
 end)
 
