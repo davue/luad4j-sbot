@@ -270,11 +270,11 @@ command.add("playlist", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() > 0) then
 		local playlist = audioPlayer.getPlaylist()
-		local message = ""
+		local message = "```"
 		for k, track in pairs(playlist) do
 			message = message..k..": "..track.getTitle()
 		end
-		msg.getChannel().sendMessage(message)
+		msg.getChannel().sendMessage(message.."```")
 	else
 		msg.getChannel().sendMessage("[INFO] There are no tracks in the playlist.")
 	end
