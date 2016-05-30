@@ -251,14 +251,26 @@ end)
 
 command.add("status", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getTitle() .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
+	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getTitle() .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nLooping:       ".. audioPlayer.isLooping() .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
 	msg.delete()
 end)
 
 command.add("track", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() > 0) then
-		msg.getChannel().sendMessage("[INFO] Current track: ".. audioPlayer.getCurrentTrack().getTitle())
+		msg.getChannel().sendMessage("[INFO] Current track: `".. audioPlayer.getCurrentTrack().getTitle().."`")
+	else
+		msg.getChannel().sendMessage("[INFO] There is no queued audio.")
+	end
+	
+	msg.delete()
+end)
+
+command.add("next", function(msg, args)
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	if(audioPlayer.playlistSize() > 0) then
+		local playlist = audioPlayer.getPlaylist()
+		msg.getChannel().sendMessage("[INFO] Next track: `".. playlist[2].getTitle().."`")
 	else
 		msg.getChannel().sendMessage("[INFO] There is no queued audio.")
 	end
