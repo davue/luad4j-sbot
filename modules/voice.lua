@@ -1,3 +1,6 @@
+depends.onLib("command")
+depends.onLib("other")
+
 --------------
 ---- Init ----
 --------------
