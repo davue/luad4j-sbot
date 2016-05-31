@@ -20,13 +20,6 @@ function loadDependencyManager()
 	end
 end
 
-function loadLibs() -- Load Libraries
-	local lsStr = os.capture("ls "..libPath)
-	for file in string.gmatch(lsStr, "(%a+).lua") do 
-		depends.onLib(file)
-	end
-end
-
 function loadModules() -- Load Modules
 	local lsStr = os.capture("ls "..modulePath)
 	for file in string.gmatch(lsStr, "(%a+).lua") do 
@@ -53,6 +46,8 @@ mainChannel.sendMessage("[INFO] Initialized!")
 -----------------------------
 ---- Vital Chat Commands ----
 -----------------------------
+depends.onLib("core")
+
 command.add("update", function(msg, args)
 	if(core.isAdmin(msg)) then
 		os.execute("git -C ".. luaPath .." reset --hard")
@@ -62,7 +57,7 @@ command.add("update", function(msg, args)
 			text = string.sub(text, endPos+15)																		-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")														-- Format file changes
 			mainChannel.sendMessage("[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
-			mainChannel.sendMessage("[Update] Please reload the bot to apply the changes.")			-- Safety delay to give the update process some time (needs admin credentials)
+			command.getTable()["reload"]()																			-- Reload bot after update
 		else
 			mainChannel.sendMessage("[Update] Already up-to-date.")
 		end
