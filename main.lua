@@ -38,7 +38,6 @@ end
 
 loadDependencyManager() 	-- Load dependency manager
 
-loadLibs()					-- Load essential libraries
 loadModules()				-- Load additional modules
 
 mainChannel.sendMessage("[INFO] Initialized!")
