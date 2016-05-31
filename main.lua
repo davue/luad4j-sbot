@@ -78,6 +78,10 @@ end)
 ----------------
 ---- Events ----
 ----------------
+function onAudioUpdateEvent()
+	hook.call("onAudioUpdate")
+end
+
 function onDiscordDisconnectedEvent(reason)
 	hook.call("onDiscordDisconnected", reason)
 end

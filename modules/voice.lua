@@ -1,5 +1,6 @@
 depends.onLib("command")
 depends.onLib("other")
+depends.onLib("hook")
 
 --------------
 ---- Init ----
@@ -7,6 +8,11 @@ depends.onLib("other")
 local busy = false		-- If something is currently being queued
 local cancel = false		-- If a user wants to cancel the queueing process
 local audioPlayers = {} -- Table with audioPlayers depending on guilds
+
+hook.add("onAudioUpdate", "updateStatus", function()
+	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
+	discord.setGame(audioPlayer.getCurrentTrack().getTitle())
+end)
 
 --------------------------
 ---- Helper Functions ----
