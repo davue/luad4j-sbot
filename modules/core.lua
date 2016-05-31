@@ -1,4 +1,5 @@
 depends.onLib("core")
+depends.onLib("command")
 
 --[[ Core module - Docs:
 This module provides the most basic set of functions.

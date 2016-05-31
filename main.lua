@@ -46,6 +46,7 @@ mainChannel.sendMessage("[INFO] Initialized!")
 ---- Vital Chat Commands ----
 -----------------------------
 depends.onLib("core")
+depends.onLib("command")
 
 command.add("update", function(msg, args)
 	if(core.isAdmin(msg)) then
