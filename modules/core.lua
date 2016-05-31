@@ -1,3 +1,5 @@
+depends.onLib("core")
+
 --[[ Core module - Docs:
 This module provides the most basic set of functions.
 
