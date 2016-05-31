@@ -56,7 +56,7 @@ command.add("update", function(msg, args)
 			local beginPos, endPos, fromVersion, toVersion = string.find(text, "(%w+)%.%.(%w+)") 	-- Get version hashes
 			text = string.sub(text, endPos+15)																		-- Remove version hashes from string
 			text = string.gsub(text, "([%+%-]+)%s", "%1\n")														-- Format file changes
-			mainChannel.sendMessage("[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">\n"..text)
+			mainChannel.sendMessage("[Update] Updating from <".. fromVersion .."> to <".. toVersion .. ">:\n```"..text.."```")
 			command.getTable()["reload"]()																			-- Reload bot after update
 		else
 			mainChannel.sendMessage("[Update] Already up-to-date.")
