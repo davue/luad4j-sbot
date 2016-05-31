@@ -36,10 +36,10 @@ function depends.onLib(name)
 		if(func == nil) then
 			mainChannel.sendMessage("[DEPENDS][ERROR] Error loading library ("..name.."):\n"..errorStr)
 		else
-			func()
+			local lib = func()
 			print("[LUA] Library ("..name..") loaded!")
 			table.insert(loaded["libs"], name)
-			return true
+			return lib
 		end
 	end
 end
@@ -50,10 +50,10 @@ function depends.onModule(name)
 		if(func == nil) then
 			mainChannel.sendMessage("[DEPENDS][ERROR] Error loading module ("..name.."):\n"..errorStr)
 		else
-			func()
+			local module = func()
 			print("[LUA] Module ("..name..") loaded!")
 			table.insert(loaded["modules"], name)
-			return true
+			return module
 		end
 	end
 end
