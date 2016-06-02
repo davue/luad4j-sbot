@@ -10,6 +10,7 @@ local cancel = false		-- If a user wants to cancel the queueing process
 local audioPlayers = {} -- Table with audioPlayers depending on guilds
 
 hook.add("onAudioUpdate", "updateStatus", function(guildid)
+	print("[LUA] onAudioUpdate triggered!")
 	local audioPlayer = getAudioPlayer(guildid)
 	discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
 end)
