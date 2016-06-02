@@ -78,8 +78,8 @@ end)
 ----------------
 ---- Events ----
 ----------------
-function onAudioUpdateEvent()
-	hook.call("onAudioUpdate")
+function onAudioUpdateEvent(guildid)
+	hook.call("onAudioUpdate", guildid)
 end
 
 function onDiscordDisconnectedEvent(reason)

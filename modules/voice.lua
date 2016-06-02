@@ -9,9 +9,9 @@ local busy = false		-- If something is currently being queued
 local cancel = false		-- If a user wants to cancel the queueing process
 local audioPlayers = {} -- Table with audioPlayers depending on guilds
 
-hook.add("onAudioUpdate", "updateStatus", function()
-	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	discord.setGame(audioPlayer.getCurrentTrack().getTitle())
+hook.add("onAudioUpdate", "updateStatus", function(guildid)
+	local audioPlayer = getAudioPlayer(guildid)
+	discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
 end)
 
 --------------------------
@@ -37,7 +37,7 @@ command.add("weareone", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() == 0) then
 		if(#args == 1 and (args[1] == "technobase" or args[1] == "housetime" or args[1] == "hardbase" or args[1] == "trancebase" or args[1] == "coretime" or args[1] == "clubtime")) then
-			audioPlayer.queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls").setTitle(string.upper(args[1][1])..string.sub(args[1],2))
+			audioPlayer.queueURL("http://listen.".. args[1] ..".fm/tunein-mp3-pls").setMetadata("title", string.upper(args[1][1])..string.sub(args[1],2))
 		else
 			msg.getChannel().sendMessage("[INFO] Usage: weareone (technobase/housetime/hardbase/trancebase/coretime/clubtime)")
 		end
@@ -66,7 +66,7 @@ command.add("add", function(msg, args)
 					end
 					
 					if(file_exists(filepath)) then
-						audioPlayer.queueFile(filepath).setTitle(title) -- Queue file
+						audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
 						loaded = true
 					else
 						print("[LUA][addpl] Skipping: "..filepath)
@@ -84,18 +84,18 @@ command.add("add", function(msg, args)
 					end
 					
 					if(file_exists(filepath)) then
-						audioPlayer.queueFile(filepath).setTitle(title) -- Queue file
+						audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
 						loaded = true
 					else
 						print("[LUA][addpl] Skipping: "..filepath)
 					end
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
-				audioPlayer.queueURL(args[1]).setTitle("<Direct Link>")
+				audioPlayer.queueURL(args[1]).setMetadata("title", "<Direct Link>")
 				loaded = true
 			else -- It's probably a file
 				if(file_exists(args[1])) then
-					audioPlayer.queueFile(args[1]).setTitle("<Local File>")
+					audioPlayer.queueFile(args[1]).setMetadata("title", "<Local File>")
 				else
 					msg.getChannel().sendMessage("[INFO] Couldn't find file: ".. args[1])
 				end
@@ -145,7 +145,7 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setTitle(title) -- Queue file
+									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
@@ -171,7 +171,7 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setTitle(title) -- Queue file
+									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
@@ -201,7 +201,7 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setTitle(title) -- Queue file
+									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
@@ -260,14 +260,14 @@ end)
 
 command.add("status", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getTitle() .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nLooping:       ".. tostring(audioPlayer.isLooping()) .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
+	msg.getChannel().sendMessage("```\nCurrent Track: ".. audioPlayer.getCurrentTrack().getMetadata()["title"] .."\nQueue Length:  ".. audioPlayer.playlistSize() .."\nLooping:       ".. tostring(audioPlayer.isLooping()) .."\nVolume:        ".. audioPlayer.getVolume()*100 .."%\n```")
 	msg.delete()
 end)
 
 command.add("track", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() > 0) then
-		msg.getChannel().sendMessage("[INFO] Current track: `".. audioPlayer.getCurrentTrack().getTitle().."`")
+		msg.getChannel().sendMessage("[INFO] Current track: `".. audioPlayer.getCurrentTrack().getMetadata()["title"].."`")
 	else
 		msg.getChannel().sendMessage("[INFO] There is no queued audio.")
 	end
@@ -279,7 +279,7 @@ command.add("next", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(audioPlayer.playlistSize() > 0) then
 		local playlist = audioPlayer.getPlaylist()
-		msg.getChannel().sendMessage("[INFO] Next track: `".. playlist[2].getTitle().."`")
+		msg.getChannel().sendMessage("[INFO] Next track: `".. playlist[2].getMetadata()["title"].."`")
 	else
 		msg.getChannel().sendMessage("[INFO] There is no queued audio.")
 	end
@@ -294,9 +294,9 @@ command.add("playlist", function(msg, args)
 		local message = "[INFO] Playlist:\n```"
 		for k, track in pairs(playlist) do
 			if(k == 1) then
-				message = message.."-> "..track.getTitle().."\n"
+				message = message.."-> "..track.getMetadata()["title"].."\n"
 			else
-				message = message.. k-1 ..": "..track.getTitle().."\n"
+				message = message.. k-1 ..": "..track.getMetadata()["title"].."\n"
 			end
 		end
 		msg.getChannel().sendMessage(message.."```")
