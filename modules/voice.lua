@@ -2,24 +2,6 @@ depends.onLib("command")
 depends.onLib("other")
 depends.onLib("hook")
 
---------------
----- Init ----
---------------
-local busy = false		-- If something is currently being queued
-local cancel = false		-- If a user wants to cancel the queueing process
-local audioPlayers = {} -- Table with audioPlayers depending on guilds
-
-hook.add("onAudioUpdate", "updateStatus", function(guildid)
-	print("Yo, here comes the guildid:")
-	print(guildid)
-	local audioPlayer = getAudioPlayer(guildid)
-	if(audioPlayer.playlistSize() > 0) then
-		discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
-	else
-		discord.clearStatus()
-	end
-end)
-
 --------------------------
 ---- Helper Functions ----
 --------------------------
@@ -31,6 +13,22 @@ local function getAudioPlayer(guildID)
 		return audioPlayers[guildID]
 	end
 end
+
+--------------
+---- Init ----
+--------------
+local busy = false		-- If something is currently being queued
+local cancel = false		-- If a user wants to cancel the queueing process
+local audioPlayers = {} -- Table with audioPlayers depending on guilds
+
+hook.add("onAudioUpdate", "updateStatus", function(guildid)
+	local audioPlayer = getAudioPlayer(guildid)
+	if(audioPlayer.playlistSize() > 0) then
+		discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+	else
+		discord.clearStatus()
+	end
+end)
 
 ------------------
 ---- Commands ----
