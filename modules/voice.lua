@@ -12,7 +12,11 @@ local audioPlayers = {} -- Table with audioPlayers depending on guilds
 hook.add("onAudioUpdate", "updateStatus", function(guildid)
 	print("[LUA] onAudioUpdate triggered!")
 	local audioPlayer = getAudioPlayer(guildid)
-	discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+	if(audioPlayer.playlistSize() > 0) then
+		discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+	else
+		discord.clearStatus()
+	end
 end)
 
 --------------------------
@@ -67,7 +71,12 @@ command.add("add", function(msg, args)
 					end
 					
 					if(file_exists(filepath)) then
-						audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+						if(audioPlayer.playlistSize() == 0) then
+							audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+							discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+						else
+							audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+						end
 						loaded = true
 					else
 						print("[LUA][addpl] Skipping: "..filepath)
@@ -85,22 +94,37 @@ command.add("add", function(msg, args)
 					end
 					
 					if(file_exists(filepath)) then
-						audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+						if(audioPlayer.playlistSize() == 0) then
+							audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+							discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+						else
+							audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+						end
 						loaded = true
 					else
 						print("[LUA][addpl] Skipping: "..filepath)
 					end
 				end
 			elseif(string.find(args[1], "https?://") ~= nil) then -- If it's another link
-				audioPlayer.queueURL(args[1]).setMetadata("title", "<Direct Link>")
+				if(audioPlayer.playlistSize() == 0) then
+					audioPlayer.queueURL(args[1]).setMetadata("title", "<Direct Link>")
+					discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+				else
+					audioPlayer.queueURL(args[1]).setMetadata("title", "<Direct Link>")
+				end
 				loaded = true
 			else -- It's probably a file
 				if(file_exists(args[1])) then
-					audioPlayer.queueFile(args[1]).setMetadata("title", "<Local File>")
+					if(audioPlayer.playlistSize() == 0) then
+						audioPlayer.queueFile(args[1]).setMetadata("title", "<Local File>")
+						discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+					else
+						audioPlayer.queueFile(args[1]).setMetadata("title", "<Local File>")
+					end
+					loaded = true
 				else
 					msg.getChannel().sendMessage("[INFO] Couldn't find file: ".. args[1])
 				end
-				loaded = true
 			end
 			
 			if not loaded then
@@ -146,7 +170,12 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									if(audioPlayer.playlistSize() == 0) then
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+										discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+									else
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									end
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
@@ -172,7 +201,12 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									if(audioPlayer.playlistSize() == 0) then
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+										discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+									else
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									end
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
@@ -202,7 +236,12 @@ command.add("addpl", function(msg, args)
 								end
 								
 								if(file_exists(filepath)) then
-									audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									if(audioPlayer.playlistSize() == 0) then
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+										discord.setGame(audioPlayer.getCurrentTrack().getMetadata()["title"])
+									else
+										audioPlayer.queueFile(filepath).setMetadata("title", title) -- Queue file
+									end
 								else
 									print("[LUA][addpl] Skipping: "..filepath)
 								end
