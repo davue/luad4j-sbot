@@ -58,7 +58,7 @@ command.add("yt", function(msg, args)
 		local query = string.gsub(string.sub(msg.getContent(), 5), " ", "%%20")
 		local response = os.capture("curl https://www.googleapis.com/youtube/v3/search?part=id&maxResults=1&q=darude%20sandstorm&key=AIzaSyBa6XiUJQsM0ISlGbs6zUsKCu422MHUAhs")
 		local videoID = string.match(response, "\"videoId\": \"(.+)\"")
-		command.getTable()["add"](msg, videoID) -- Add query to playlist
+		command.getTable()["add"](msg, {"https://www.youtube.com/watch?v="..videoID}) -- Add query to playlist
 	else
 		msg.getChannel().sendMessage("[INFO] Usage: yt <query>")
 	end
