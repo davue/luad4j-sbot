@@ -435,7 +435,7 @@ end)
 -------------------
 command.add("stop", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
-	audioPlayer.skipTo(audioPlayer.playlistSize()+1)
+	audioPlayer.skipTo(audioPlayer.playlistSize())
 	
 	msg.delete()
 end)
