@@ -56,7 +56,7 @@ command.add("yt", function(msg, args)
 	local audioPlayer = getAudioPlayer(msg.getGuild().getID())
 	if(#args > 0) then
 		local query = string.gsub(string.sub(msg.getContent(), 5), " ", "+")
-		local response = os.capture("curl hhttps://www.googleapis.com/youtube/v3/search?part=id&maxResults=1&q=".. query .."&safeSearch=none&type=video&videoDimension=2d&key=AIzaSyBwdMQOlrImDMk_3JpAK0UKUW3Qfu2ayVs")
+		local response = os.capture("curl https://www.googleapis.com/youtube/v3/search?part=id&maxResults=1&q=".. query .."&safeSearch=none&type=video&videoDimension=2d&key=AIzaSyBwdMQOlrImDMk_3JpAK0UKUW3Qfu2ayVs")
 		local videoID = string.match(response, "\"videoId\": \"(.+)\"")
 		command.getTable()["add"](msg, {"https://www.youtube.com/watch?v="..videoID}) -- Add query to playlist
 	else
